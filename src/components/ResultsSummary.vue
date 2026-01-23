@@ -27,6 +27,16 @@ const props = defineProps<{
   netYield: number
   cashOnCashReturn: number
   rentMultiplier: number
+
+  // Tax calculations
+  annualDepreciation: number
+  annualDeductibleInterest: number
+  annualExpenses: number
+  totalDeductibleExpenses: number
+  annualTaxSavings: number
+  monthlyCashFlowAfterTax: number
+  annualCashFlowAfterTax: number
+  cashOnCashReturnAfterTax: number
 }>()
 
 function formatCurrency(value: number): string {
@@ -185,6 +195,97 @@ function getRentMultiplierColor(value: number): string {
             <div class="absolute hidden group-hover:block bg-gray-800 text-white text-xs p-2 rounded shadow-lg z-10 w-48 -top-2 left-1/2 -translate-x-1/2 -translate-y-full">
               Purchase price divided by annual rent. Lower is better. Under 20 is good, under 25 is acceptable.
             </div>
+          </div>
+
+          <!-- Tax-Adjusted Return -->
+          <div class="bg-green-50 rounded-md p-3 text-center relative group cursor-help col-span-2">
+            <p class="text-xs text-green-600 mb-1">Tax-Adjusted Return (Rendite nach Steuervorteil)</p>
+            <p class="text-xl font-bold" :class="getCashFlowColor(cashOnCashReturnAfterTax)">
+              {{ formatPercent(cashOnCashReturnAfterTax) }}
+            </p>
+            <p class="text-xs text-gray-500">Cash Flow + Tax Savings / Equity</p>
+            <div class="absolute hidden group-hover:block bg-gray-800 text-white text-xs p-2 rounded shadow-lg z-10 w-48 -top-2 left-1/2 -translate-x-1/2 -translate-y-full">
+              Annual cash flow including tax savings divided by equity invested. Shows actual return considering tax benefits.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tax Benefits -->
+      <div>
+        <h3 class="text-lg font-medium text-gray-700 mb-2">Tax Benefits (Steuerliche Vorteile)</h3>
+        <div class="bg-gray-50 rounded-md p-4 space-y-2">
+          <!-- Header -->
+          <div class="flex justify-between text-xs text-gray-500 font-medium">
+            <span></span>
+            <div class="flex gap-4">
+              <span class="w-20 text-right">Monthly</span>
+              <span class="w-20 text-right">Annual</span>
+            </div>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Depreciation (AfA)</span>
+            <div class="flex gap-4">
+              <span class="w-20 text-right text-green-600">{{ formatCurrency(annualDepreciation / 12) }}</span>
+              <span class="w-20 text-right text-green-600">{{ formatCurrency(annualDepreciation) }}</span>
+            </div>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Deductible Interest (Schuldzinsen)</span>
+            <div class="flex gap-4">
+              <span class="w-20 text-right text-green-600">{{ formatCurrency(annualDeductibleInterest / 12) }}</span>
+              <span class="w-20 text-right text-green-600">{{ formatCurrency(annualDeductibleInterest) }}</span>
+            </div>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Operating Costs (Bewirtschaftungskosten)</span>
+            <div class="flex gap-4">
+              <span class="w-20 text-right text-green-600">{{ formatCurrency(annualExpenses / 12) }}</span>
+              <span class="w-20 text-right text-green-600">{{ formatCurrency(annualExpenses) }}</span>
+            </div>
+          </div>
+          <hr class="border-gray-300" />
+          <div class="flex justify-between font-medium">
+            <span>Total Deductible (Absetzbar gesamt)</span>
+            <div class="flex gap-4">
+              <span class="w-20 text-right text-green-600">{{ formatCurrency(totalDeductibleExpenses / 12) }}</span>
+              <span class="w-20 text-right text-green-600">{{ formatCurrency(totalDeductibleExpenses) }}</span>
+            </div>
+          </div>
+          <div class="flex justify-between font-bold text-lg bg-green-100 -mx-4 px-4 py-2 rounded">
+            <span>Tax Savings (Steuerersparnis)</span>
+            <div class="flex gap-4">
+              <span class="w-20 text-right text-green-600">{{ formatCurrency(annualTaxSavings / 12) }}</span>
+              <span class="w-20 text-right text-green-600">{{ formatCurrency(annualTaxSavings) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Effective Cash Flow After Tax -->
+      <div>
+        <h3 class="text-lg font-medium text-gray-700 mb-2">Effective Cash Flow (After Tax Benefits)</h3>
+        <div class="bg-green-50 rounded-md p-4 space-y-2">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Pre-Tax Cash Flow</span>
+            <span :class="getCashFlowColor(monthlyCashFlow)">{{ formatCurrency(monthlyCashFlow) }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">+ Monthly Tax Savings</span>
+            <span class="text-green-600">+{{ formatCurrency(annualTaxSavings / 12) }}</span>
+          </div>
+          <hr class="border-green-300" />
+          <div class="flex justify-between font-bold text-lg">
+            <span>= Effective Monthly Cash Flow</span>
+            <span :class="getCashFlowColor(monthlyCashFlowAfterTax)">
+              {{ formatCurrency(monthlyCashFlowAfterTax) }}
+            </span>
+          </div>
+          <div class="flex justify-between text-sm text-gray-500">
+            <span>Annual</span>
+            <span :class="getCashFlowColor(annualCashFlowAfterTax)">
+              {{ formatCurrency(annualCashFlowAfterTax) }}
+            </span>
           </div>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import PropertyInput from './components/PropertyInput.vue'
 import FinancingInput from './components/FinancingInput.vue'
 import RentalInput from './components/RentalInput.vue'
+import TaxInput from './components/TaxInput.vue'
 import ResultsSummary from './components/ResultsSummary.vue'
 import { useCalculations } from './composables/useCalculations'
 
@@ -26,6 +27,15 @@ const monthlyHausgeld = ref(150)
 const maintenanceReserve = ref(50)
 const vacancyRate = ref(3)
 
+// Tax inputs
+const depreciationRate = ref(2)
+const landValuePercent = ref(20)
+const taxInputMode = ref<'rate' | 'income'>('rate')
+const marginalTaxRate = ref(42)
+const taxableIncome = ref(60000)
+const includeSoli = ref(true)
+const jointTaxDeclaration = ref(false)
+
 // Calculate everything
 const calculations = useCalculations(
   {
@@ -47,6 +57,15 @@ const calculations = useCalculations(
     monthlyHausgeld,
     maintenanceReserve,
     vacancyRate,
+  },
+  {
+    depreciationRate,
+    landValuePercent,
+    taxInputMode,
+    marginalTaxRate,
+    taxableIncome,
+    includeSoli,
+    jointTaxDeclaration,
   }
 )
 </script>
@@ -92,6 +111,20 @@ const calculations = useCalculations(
             :effectiveMonthlyRent="calculations.effectiveMonthlyRent.value"
             :annualRent="calculations.annualRent.value"
           />
+
+          <TaxInput
+            v-model:depreciationRate="depreciationRate"
+            v-model:landValuePercent="landValuePercent"
+            v-model:taxInputMode="taxInputMode"
+            v-model:marginalTaxRate="marginalTaxRate"
+            v-model:taxableIncome="taxableIncome"
+            v-model:includeSoli="includeSoli"
+            v-model:jointTaxDeclaration="jointTaxDeclaration"
+            :buildingValue="calculations.buildingValue.value"
+            :landValue="calculations.landValue.value"
+            :annualDepreciation="calculations.annualDepreciation.value"
+            :effectiveMarginalRate="calculations.effectiveMarginalRate.value"
+          />
         </div>
 
         <!-- Right Column: Results -->
@@ -117,6 +150,14 @@ const calculations = useCalculations(
             :netYield="calculations.netYield.value"
             :cashOnCashReturn="calculations.cashOnCashReturn.value"
             :rentMultiplier="calculations.rentMultiplier.value"
+            :annualDepreciation="calculations.annualDepreciation.value"
+            :annualDeductibleInterest="calculations.annualDeductibleInterest.value"
+            :annualExpenses="calculations.annualExpenses.value"
+            :totalDeductibleExpenses="calculations.totalDeductibleExpenses.value"
+            :annualTaxSavings="calculations.annualTaxSavings.value"
+            :monthlyCashFlowAfterTax="calculations.monthlyCashFlowAfterTax.value"
+            :annualCashFlowAfterTax="calculations.annualCashFlowAfterTax.value"
+            :cashOnCashReturnAfterTax="calculations.cashOnCashReturnAfterTax.value"
           />
         </div>
       </div>
