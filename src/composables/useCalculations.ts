@@ -156,14 +156,21 @@ export function useCalculations(
     return tax.depreciationRate.value
   })
 
+  // Total acquisition costs (Anschaffungskosten) for depreciation base
+  // Includes purchase price + Anschaffungsnebenkosten (transfer tax, notary fees, land registry, broker)
+  // All these costs are depreciated proportionally (building portion only)
+  const totalAcquisitionCost = computed(() =>
+    property.purchasePrice.value + totalPurchaseCosts.value
+  )
+
   const buildingValue = computed(() => {
-    if (!tax) return property.purchasePrice.value * 0.8
-    return property.purchasePrice.value * (1 - tax.landValuePercent.value / 100)
+    if (!tax) return totalAcquisitionCost.value * 0.8
+    return totalAcquisitionCost.value * (1 - tax.landValuePercent.value / 100)
   })
 
   const landValue = computed(() => {
-    if (!tax) return property.purchasePrice.value * 0.2
-    return property.purchasePrice.value * (tax.landValuePercent.value / 100)
+    if (!tax) return totalAcquisitionCost.value * 0.2
+    return totalAcquisitionCost.value * (tax.landValuePercent.value / 100)
   })
 
   const annualDepreciation = computed(() =>
@@ -260,6 +267,7 @@ export function useCalculations(
 
     // Tax calculations
     depreciationRate,
+    totalAcquisitionCost,
     buildingValue,
     landValue,
     annualDepreciation,

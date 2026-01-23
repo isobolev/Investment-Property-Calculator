@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 const props = defineProps<{
   // Purchase costs
   purchasePrice: number
@@ -10,9 +12,14 @@ const props = defineProps<{
   purchaseCostsRate: number
   totalInvestment: number
 
+  // Assumptions
+  appreciationRate: number
+  holdingPeriod: number
+
   // Financing
   equity: number
   loanAmount: number
+  interestRate: number
   monthlyMortgage: number
   annualMortgage: number
 
@@ -70,6 +77,33 @@ function getRentMultiplierColor(value: number): string {
   if (value <= 25) return 'text-yellow-600'
   return 'text-red-600'
 }
+
+// Resale calculations
+const resalePrice = computed(() =>
+  props.purchasePrice * Math.pow(1 + props.appreciationRate / 100, props.holdingPeriod)
+)
+
+const appreciation = computed(() => resalePrice.value - props.purchasePrice)
+
+// Remaining loan balance after holding period (annuity formula)
+const remainingBalance = computed(() => {
+  if (props.loanAmount <= 0 || props.monthlyMortgage <= 0) return 0
+
+  const monthlyRate = props.interestRate / 100 / 12
+  const months = props.holdingPeriod * 12
+
+  if (monthlyRate === 0) {
+    // No interest case: simple subtraction
+    return Math.max(0, props.loanAmount - props.monthlyMortgage * months)
+  }
+
+  // Remaining balance = L × (1+r)^n - P × ((1+r)^n - 1) / r
+  const factor = Math.pow(1 + monthlyRate, months)
+  const balance = props.loanAmount * factor - props.monthlyMortgage * (factor - 1) / monthlyRate
+  return Math.max(0, balance)
+})
+
+const principalPaid = computed(() => props.loanAmount - remainingBalance.value)
 </script>
 
 <template>
@@ -110,6 +144,30 @@ function getRentMultiplierColor(value: number): string {
           <div class="flex justify-between font-bold text-lg">
             <span>Total Investment (Gesamtinvestition)</span>
             <span class="text-blue-600">{{ formatCurrency(totalInvestment) }}</span>
+          </div>
+        </div>
+
+        <!-- Resale Price -->
+        <div class="bg-emerald-50 rounded-md p-4 mt-3 space-y-2">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Property Value after {{ holdingPeriod }} years</span>
+            <span class="font-medium text-emerald-700">{{ formatCurrency(resalePrice) }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Appreciation ({{ appreciationRate }}% p.a.)</span>
+            <span class="text-emerald-600">+{{ formatCurrency(appreciation) }}</span>
+          </div>
+          <p class="text-xs text-gray-500">
+            {{ holdingPeriod >= 10 ? 'Tax-free sale possible (Spekulationsfrist)' : `${10 - holdingPeriod} more years until tax-free sale` }}
+          </p>
+          <hr class="border-emerald-200 my-2" />
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Remaining Loan Balance</span>
+            <span class="font-medium text-red-600">{{ formatCurrency(remainingBalance) }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Principal Paid ({{ holdingPeriod }} yrs)</span>
+            <span class="text-gray-700">{{ formatCurrency(principalPaid) }}</span>
           </div>
         </div>
       </div>

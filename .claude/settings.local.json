@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npm create:*)",
       "Bash(npm run build:*)",
-      "Bash(timeout 10 npm run dev)"
+      "Bash(timeout 10 npm run dev)",
+      "Bash(npx vite build:*)"
     ]
   }
 }

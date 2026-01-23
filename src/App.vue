@@ -4,6 +4,7 @@ import PropertyInput from './components/PropertyInput.vue'
 import FinancingInput from './components/FinancingInput.vue'
 import RentalInput from './components/RentalInput.vue'
 import TaxInput from './components/TaxInput.vue'
+import AssumptionsInput from './components/AssumptionsInput.vue'
 import ResultsSummary from './components/ResultsSummary.vue'
 import { useCalculations } from './composables/useCalculations'
 
@@ -35,6 +36,11 @@ const marginalTaxRate = ref(42)
 const taxableIncome = ref(60000)
 const includeSoli = ref(true)
 const jointTaxDeclaration = ref(false)
+
+// Assumptions
+const appreciationRate = ref(2)
+const inflationRate = ref(2)
+const holdingPeriod = ref(10)
 
 // Calculate everything
 const calculations = useCalculations(
@@ -125,6 +131,12 @@ const calculations = useCalculations(
             :annualDepreciation="calculations.annualDepreciation.value"
             :effectiveMarginalRate="calculations.effectiveMarginalRate.value"
           />
+
+          <AssumptionsInput
+            v-model:appreciationRate="appreciationRate"
+            v-model:inflationRate="inflationRate"
+            v-model:holdingPeriod="holdingPeriod"
+          />
         </div>
 
         <!-- Right Column: Results -->
@@ -138,8 +150,11 @@ const calculations = useCalculations(
             :totalPurchaseCosts="calculations.totalPurchaseCosts.value"
             :purchaseCostsRate="calculations.purchaseCostsRate.value"
             :totalInvestment="calculations.totalInvestment.value"
+            :appreciationRate="appreciationRate"
+            :holdingPeriod="holdingPeriod"
             :equity="equity"
             :loanAmount="calculations.loanAmount.value"
+            :interestRate="interestRate"
             :monthlyMortgage="calculations.monthlyMortgage.value"
             :annualMortgage="calculations.annualMortgage.value"
             :effectiveMonthlyRent="calculations.effectiveMonthlyRent.value"
