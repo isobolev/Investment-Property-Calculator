@@ -143,13 +143,6 @@ export function useCalculations(
       : 0
   )
 
-  // Cash-on-cash return (return on equity invested)
-  const cashOnCashReturn = computed(() =>
-    financing.equity.value > 0
-      ? (annualCashFlow.value / financing.equity.value) * 100
-      : 0
-  )
-
   // Rent multiplier (Kaufpreisfaktor)
   const rentMultiplier = computed(() =>
     annualRent.value > 0
@@ -202,8 +195,16 @@ export function useCalculations(
     annualDepreciation.value + annualDeductibleInterest.value + annualExpenses.value
   )
 
+  // Taxable rental income (Einkünfte aus Vermietung und Verpachtung)
+  // Negative = loss that offsets other income, Positive = taxable profit
+  const taxableRentalIncome = computed(() =>
+    effectiveAnnualRent.value - totalDeductibleExpenses.value
+  )
+
+  // Tax impact: negative taxable income = savings, positive = tax due
+  // We express this as "savings" so negative value means tax due
   const annualTaxSavings = computed(() =>
-    totalDeductibleExpenses.value * (effectiveMarginalRate.value / 100)
+    -taxableRentalIncome.value * (effectiveMarginalRate.value / 100)
   )
 
   const monthlyTaxSavings = computed(() => annualTaxSavings.value / 12)
@@ -214,7 +215,8 @@ export function useCalculations(
 
   const annualCashFlowAfterTax = computed(() => monthlyCashFlowAfterTax.value * 12)
 
-  const cashOnCashReturnAfterTax = computed(() =>
+  // Cash-on-cash return (return on equity invested, after tax)
+  const cashOnCashReturn = computed(() =>
     financing.equity.value > 0
       ? (annualCashFlowAfterTax.value / financing.equity.value) * 100
       : 0
@@ -264,10 +266,10 @@ export function useCalculations(
     effectiveMarginalRate,
     annualDeductibleInterest,
     totalDeductibleExpenses,
+    taxableRentalIncome,
     annualTaxSavings,
     monthlyTaxSavings,
     monthlyCashFlowAfterTax,
     annualCashFlowAfterTax,
-    cashOnCashReturnAfterTax,
   }
 }

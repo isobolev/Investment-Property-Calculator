@@ -38,6 +38,8 @@ const depreciationPresets = [
   { rate: 2, label: '2% (Standard)' },
   { rate: 2.5, label: '2.5% (Pre-1925)' },
   { rate: 3, label: '3% (New 2023+)' },
+  { rate: 5, label: '5%' },
+  { rate: 10, label: '10%' },
 ]
 
 function formatCurrency(value: number): string {
@@ -69,13 +71,13 @@ function formatPercent(value: number): string {
           :value="depreciationRate"
           @input="emit('update:depreciationRate', Number(($event.target as HTMLInputElement).value))"
           min="0.5"
-          max="3"
-          step="0.1"
+          max="10"
+          step="0.5"
           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
         />
         <div class="flex justify-between text-xs text-gray-500 mt-1">
           <span>0.5%</span>
-          <span>3%</span>
+          <span>10%</span>
         </div>
         <div class="flex flex-wrap gap-2 mt-2">
           <button

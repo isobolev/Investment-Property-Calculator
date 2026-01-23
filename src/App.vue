@@ -14,7 +14,7 @@ const stateTaxRate = ref(3.5)
 const notaryRate = ref(1.5)
 const landRegistryRate = ref(0.5)
 const brokerRate = ref(3.57)
-const includeBroker = ref(true)
+const includeBroker = ref(false)
 
 // Financing inputs
 const equity = ref(60000)
@@ -154,10 +154,11 @@ const calculations = useCalculations(
             :annualDeductibleInterest="calculations.annualDeductibleInterest.value"
             :annualExpenses="calculations.annualExpenses.value"
             :totalDeductibleExpenses="calculations.totalDeductibleExpenses.value"
+            :effectiveAnnualRent="calculations.effectiveAnnualRent.value"
+            :taxableRentalIncome="calculations.taxableRentalIncome.value"
             :annualTaxSavings="calculations.annualTaxSavings.value"
             :monthlyCashFlowAfterTax="calculations.monthlyCashFlowAfterTax.value"
             :annualCashFlowAfterTax="calculations.annualCashFlowAfterTax.value"
-            :cashOnCashReturnAfterTax="calculations.cashOnCashReturnAfterTax.value"
           />
         </div>
       </div>
