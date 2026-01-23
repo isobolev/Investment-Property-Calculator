@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 
 const equity = defineModel<number>('equity', { required: true })
 const interestRate = defineModel<number>('interestRate', { required: true })
@@ -11,6 +11,8 @@ const props = defineProps<{
   loanToValue: number
   monthlyMortgage: number
 }>()
+
+const isExpanded = ref(false)
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('de-DE', {
@@ -29,10 +31,34 @@ const equityPercent = computed(() =>
 </script>
 
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6">
-    <h2 class="text-xl font-semibold text-gray-800 mb-4">Financing (Finanzierung)</h2>
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <!-- Header -->
+    <button
+      @click="isExpanded = !isExpanded"
+      class="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+    >
+      <h2 class="text-lg font-semibold text-gray-800">Financing (Finanzierung)</h2>
+      <svg
+        :class="['w-5 h-5 text-gray-500 transition-transform', isExpanded ? 'rotate-180' : '']"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
 
-    <div class="space-y-4">
+    <!-- Summary (visible when collapsed) -->
+    <div v-if="!isExpanded" class="px-4 pb-4 -mt-2">
+      <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+        <span class="text-gray-600">Equity: <span class="font-medium text-gray-900">{{ formatCurrency(equity) }}</span></span>
+        <span class="text-gray-600">Loan: <span class="font-medium text-gray-900">{{ formatCurrency(loanAmount) }}</span></span>
+        <span class="text-gray-600">Rate: <span class="font-medium text-amber-600">{{ formatCurrency(monthlyMortgage) }}/mo</span></span>
+      </div>
+    </div>
+
+    <!-- Expanded Content -->
+    <div v-if="isExpanded" class="px-6 pb-6 space-y-4">
       <!-- Total Investment Info -->
       <div class="bg-gray-50 rounded-md p-3">
         <p class="text-sm text-gray-600">Total Investment (Gesamtinvestition) - Purchase Price + Costs</p>

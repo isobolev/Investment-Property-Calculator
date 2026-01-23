@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { marginalRatePresets, calculateMarginalRate } from '../data/germanTaxBrackets'
 
 const props = defineProps<{
@@ -26,6 +26,8 @@ const emit = defineEmits<{
   'update:includeSoli': [value: boolean]
   'update:jointTaxDeclaration': [value: boolean]
 }>()
+
+const isExpanded = ref(false)
 
 const calculatedMarginalRate = computed(() => {
   const incomeForCalculation = props.jointTaxDeclaration
@@ -57,10 +59,34 @@ function formatPercent(value: number): string {
 </script>
 
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6">
-    <h2 class="text-xl font-semibold text-gray-800 mb-4">Tax Deductions (Steuerliche Abschreibung)</h2>
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <!-- Header -->
+    <button
+      @click="isExpanded = !isExpanded"
+      class="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+    >
+      <h2 class="text-lg font-semibold text-gray-800">Tax Deductions (Steuerliche Abschreibung)</h2>
+      <svg
+        :class="['w-5 h-5 text-gray-500 transition-transform', isExpanded ? 'rotate-180' : '']"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
 
-    <div class="space-y-4">
+    <!-- Summary (visible when collapsed) -->
+    <div v-if="!isExpanded" class="px-4 pb-4 -mt-2">
+      <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+        <span class="text-gray-600">AfA: <span class="font-medium text-gray-900">{{ depreciationRate }}%</span></span>
+        <span class="text-gray-600">Tax Rate: <span class="font-medium text-blue-600">{{ formatPercent(effectiveMarginalRate) }}</span></span>
+        <span class="text-gray-600">Depreciation: <span class="font-medium text-green-600">{{ formatCurrency(annualDepreciation) }}/yr</span></span>
+      </div>
+    </div>
+
+    <!-- Expanded Content -->
+    <div v-if="isExpanded" class="px-6 pb-6 space-y-4">
       <!-- Depreciation Rate -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">
