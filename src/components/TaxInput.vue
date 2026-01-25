@@ -1,40 +1,40 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { marginalRatePresets, calculateMarginalRate } from '../data/germanTaxBrackets'
+import { ref, computed } from 'vue';
+import { marginalRatePresets, calculateMarginalRate } from '../data/germanTaxBrackets';
 
 const props = defineProps<{
-  depreciationRate: number
-  landValuePercent: number
-  taxInputMode: 'rate' | 'income'
-  marginalTaxRate: number
-  taxableIncome: number
-  includeSoli: boolean
-  jointTaxDeclaration: boolean
+  depreciationRate: number;
+  landValuePercent: number;
+  taxInputMode: 'rate' | 'income';
+  marginalTaxRate: number;
+  taxableIncome: number;
+  includeSoli: boolean;
+  jointTaxDeclaration: boolean;
   // Calculated values for display
-  buildingValue: number
-  landValue: number
-  annualDepreciation: number
-  effectiveMarginalRate: number
-}>()
+  buildingValue: number;
+  landValue: number;
+  annualDepreciation: number;
+  effectiveMarginalRate: number;
+}>();
 
 const emit = defineEmits<{
-  'update:depreciationRate': [value: number]
-  'update:landValuePercent': [value: number]
-  'update:taxInputMode': [value: 'rate' | 'income']
-  'update:marginalTaxRate': [value: number]
-  'update:taxableIncome': [value: number]
-  'update:includeSoli': [value: boolean]
-  'update:jointTaxDeclaration': [value: boolean]
-}>()
+  'update:depreciationRate': [value: number];
+  'update:landValuePercent': [value: number];
+  'update:taxInputMode': [value: 'rate' | 'income'];
+  'update:marginalTaxRate': [value: number];
+  'update:taxableIncome': [value: number];
+  'update:includeSoli': [value: boolean];
+  'update:jointTaxDeclaration': [value: boolean];
+}>();
 
-const isExpanded = ref(false)
+const isExpanded = ref(false);
 
 const calculatedMarginalRate = computed(() => {
   const incomeForCalculation = props.jointTaxDeclaration
     ? props.taxableIncome / 2
-    : props.taxableIncome
-  return calculateMarginalRate(incomeForCalculation)
-})
+    : props.taxableIncome;
+  return calculateMarginalRate(incomeForCalculation);
+});
 
 const depreciationPresets = [
   { rate: 2, label: '2% (Standard)' },
@@ -42,7 +42,7 @@ const depreciationPresets = [
   { rate: 3, label: '3% (New 2023+)' },
   { rate: 5, label: '5%' },
   { rate: 10, label: '10%' },
-]
+];
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('de-DE', {
@@ -50,11 +50,11 @@ function formatCurrency(value: number): string {
     currency: 'EUR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(value)
+  }).format(value);
 }
 
 function formatPercent(value: number): string {
-  return value.toFixed(2) + '%'
+  return value.toFixed(2) + '%';
 }
 </script>
 

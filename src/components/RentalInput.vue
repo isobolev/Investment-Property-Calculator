@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed } from 'vue';
 
-const monthlyRent = defineModel<number>('monthlyRent', { required: true })
-const monthlyHausgeld = defineModel<number>('monthlyHausgeld', { required: true })
-const maintenanceReserve = defineModel<number>('maintenanceReserve', { required: true })
-const vacancyRate = defineModel<number>('vacancyRate', { required: true })
+const monthlyRent = defineModel<number>('monthlyRent', { required: true });
+const monthlyHausgeld = defineModel<number>('monthlyHausgeld', { required: true });
+const maintenanceReserve = defineModel<number>('maintenanceReserve', { required: true });
+const vacancyRate = defineModel<number>('vacancyRate', { required: true });
 
 const props = defineProps<{
-  effectiveMonthlyRent: number
-  annualRent: number
-}>()
+  effectiveMonthlyRent: number;
+  annualRent: number;
+}>();
 
-const isExpanded = ref(false)
+const isExpanded = ref(false);
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('de-DE', {
@@ -19,10 +19,10 @@ function formatCurrency(value: number): string {
     currency: 'EUR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(value)
+  }).format(value);
 }
 
-const totalMonthlyExpenses = computed(() => monthlyHausgeld.value + maintenanceReserve.value)
+const totalMonthlyExpenses = computed(() => monthlyHausgeld.value + maintenanceReserve.value);
 </script>
 
 <template>

@@ -1,46 +1,46 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import PropertyInput from './components/PropertyInput.vue'
-import FinancingInput from './components/FinancingInput.vue'
-import RentalInput from './components/RentalInput.vue'
-import TaxInput from './components/TaxInput.vue'
-import AssumptionsInput from './components/AssumptionsInput.vue'
-import ResultsSummary from './components/ResultsSummary.vue'
-import { useCalculations } from './composables/useCalculations'
+import { ref } from 'vue';
+import PropertyInput from './components/PropertyInput.vue';
+import FinancingInput from './components/FinancingInput.vue';
+import RentalInput from './components/RentalInput.vue';
+import TaxInput from './components/TaxInput.vue';
+import AssumptionsInput from './components/AssumptionsInput.vue';
+import ResultsSummary from './components/ResultsSummary.vue';
+import { useCalculations } from './composables/useCalculations';
 
 // Property inputs
-const purchasePrice = ref(300000)
-const stateCode = ref('BY')
-const stateTaxRate = ref(3.5)
-const notaryRate = ref(1.5)
-const landRegistryRate = ref(0.5)
-const brokerRate = ref(3.57)
-const includeBroker = ref(false)
+const purchasePrice = ref(300000);
+const stateCode = ref('BY');
+const stateTaxRate = ref(3.5);
+const notaryRate = ref(1.5);
+const landRegistryRate = ref(0.5);
+const brokerRate = ref(3.57);
+const includeBroker = ref(false);
 
 // Financing inputs
-const equity = ref(50000)
-const interestRate = ref(4)
-const repaymentRate = ref(1.5)
+const equity = ref(50000);
+const interestRate = ref(4);
+const repaymentRate = ref(1.5);
 
 // Rental inputs
-const monthlyRent = ref(1200)
-const monthlyHausgeld = ref(150)
-const maintenanceReserve = ref(50)
-const vacancyRate = ref(0)
+const monthlyRent = ref(1200);
+const monthlyHausgeld = ref(150);
+const maintenanceReserve = ref(50);
+const vacancyRate = ref(0);
 
 // Tax inputs
-const depreciationRate = ref(2)
-const landValuePercent = ref(20)
-const taxInputMode = ref<'rate' | 'income'>('rate')
-const marginalTaxRate = ref(42)
-const taxableIncome = ref(60000)
-const includeSoli = ref(true)
-const jointTaxDeclaration = ref(false)
+const depreciationRate = ref(2);
+const landValuePercent = ref(20);
+const taxInputMode = ref<'rate' | 'income'>('rate');
+const marginalTaxRate = ref(42);
+const taxableIncome = ref(60000);
+const includeSoli = ref(true);
+const jointTaxDeclaration = ref(false);
 
 // Assumptions
-const appreciationRate = ref(2)
-const inflationRate = ref(2)
-const holdingPeriod = ref(10)
+const appreciationRate = ref(2);
+const inflationRate = ref(2);
+const holdingPeriod = ref(10);
 
 // Calculate everything
 const calculations = useCalculations(
@@ -73,7 +73,7 @@ const calculations = useCalculations(
     includeSoli,
     jointTaxDeclaration,
   }
-)
+);
 </script>
 
 <template>

@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed } from 'vue';
 
-const equity = defineModel<number>('equity', { required: true })
-const interestRate = defineModel<number>('interestRate', { required: true })
-const repaymentRate = defineModel<number>('repaymentRate', { required: true })
+const equity = defineModel<number>('equity', { required: true });
+const interestRate = defineModel<number>('interestRate', { required: true });
+const repaymentRate = defineModel<number>('repaymentRate', { required: true });
 
 const props = defineProps<{
-  totalInvestment: number
-  loanAmount: number
-  loanToValue: number
-  monthlyMortgage: number
-}>()
+  totalInvestment: number;
+  loanAmount: number;
+  loanToValue: number;
+  monthlyMortgage: number;
+}>();
 
-const isExpanded = ref(false)
+const isExpanded = ref(false);
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('de-DE', {
@@ -20,16 +20,16 @@ function formatCurrency(value: number): string {
     currency: 'EUR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(value)
+  }).format(value);
 }
 
 const equityPercent = computed(() =>
   props.totalInvestment > 0 ? ((equity.value / props.totalInvestment) * 100).toFixed(1) : '0'
-)
+);
 
-const monthlyInterest = computed(() => (props.loanAmount * (interestRate.value / 100)) / 12)
+const monthlyInterest = computed(() => (props.loanAmount * (interestRate.value / 100)) / 12);
 
-const monthlyRepayment = computed(() => (props.loanAmount * (repaymentRate.value / 100)) / 12)
+const monthlyRepayment = computed(() => (props.loanAmount * (repaymentRate.value / 100)) / 12);
 </script>
 
 <template>

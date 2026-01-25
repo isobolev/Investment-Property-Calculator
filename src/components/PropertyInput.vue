@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { germanStates, getStateByCode } from '../data/germanStates'
+import { ref, computed } from 'vue';
+import { germanStates, getStateByCode } from '../data/germanStates';
 
-const purchasePrice = defineModel<number>('purchasePrice', { required: true })
-const stateCode = defineModel<string>('stateCode', { required: true })
-const stateTaxRate = defineModel<number>('stateTaxRate', { required: true })
-const notaryRate = defineModel<number>('notaryRate', { required: true })
-const landRegistryRate = defineModel<number>('landRegistryRate', { required: true })
-const brokerRate = defineModel<number>('brokerRate', { required: true })
-const includeBroker = defineModel<boolean>('includeBroker', { required: true })
+const purchasePrice = defineModel<number>('purchasePrice', { required: true });
+const stateCode = defineModel<string>('stateCode', { required: true });
+const stateTaxRate = defineModel<number>('stateTaxRate', { required: true });
+const notaryRate = defineModel<number>('notaryRate', { required: true });
+const landRegistryRate = defineModel<number>('landRegistryRate', { required: true });
+const brokerRate = defineModel<number>('brokerRate', { required: true });
+const includeBroker = defineModel<boolean>('includeBroker', { required: true });
 
-const isExpanded = ref(false)
+const isExpanded = ref(false);
 
 function onStateChange(code: string) {
-  const state = getStateByCode(code)
+  const state = getStateByCode(code);
   if (state) {
-    stateTaxRate.value = state.taxRate
+    stateTaxRate.value = state.taxRate;
   }
 }
 
@@ -25,16 +25,16 @@ function formatCurrency(value: number): string {
     currency: 'EUR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(value)
+  }).format(value);
 }
 
 const totalCostsRate = computed(() => {
-  let rate = stateTaxRate.value + notaryRate.value + landRegistryRate.value
-  if (includeBroker.value) rate += brokerRate.value
-  return rate
-})
+  let rate = stateTaxRate.value + notaryRate.value + landRegistryRate.value;
+  if (includeBroker.value) rate += brokerRate.value;
+  return rate;
+});
 
-const totalCosts = computed(() => (purchasePrice.value * totalCostsRate.value) / 100)
+const totalCosts = computed(() => (purchasePrice.value * totalCostsRate.value) / 100);
 </script>
 
 <template>

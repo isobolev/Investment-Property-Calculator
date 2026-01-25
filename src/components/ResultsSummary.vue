@@ -1,51 +1,51 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 const props = defineProps<{
   // Purchase costs
-  purchasePrice: number
-  transferTax: number
-  notaryFees: number
-  landRegistryFees: number
-  brokerFees: number
-  totalPurchaseCosts: number
-  purchaseCostsRate: number
-  totalInvestment: number
+  purchasePrice: number;
+  transferTax: number;
+  notaryFees: number;
+  landRegistryFees: number;
+  brokerFees: number;
+  totalPurchaseCosts: number;
+  purchaseCostsRate: number;
+  totalInvestment: number;
 
   // Assumptions
-  appreciationRate: number
-  holdingPeriod: number
+  appreciationRate: number;
+  holdingPeriod: number;
 
   // Financing
-  equity: number
-  loanAmount: number
-  interestRate: number
-  monthlyMortgage: number
-  annualMortgage: number
+  equity: number;
+  loanAmount: number;
+  interestRate: number;
+  monthlyMortgage: number;
+  annualMortgage: number;
 
   // Cash flow
-  effectiveMonthlyRent: number
-  monthlyExpenses: number
-  monthlyCashFlow: number
-  annualCashFlow: number
+  effectiveMonthlyRent: number;
+  monthlyExpenses: number;
+  monthlyCashFlow: number;
+  annualCashFlow: number;
 
   // Yields
-  grossYield: number
-  netYield: number
-  cashOnCashReturn: number
-  rentMultiplier: number
+  grossYield: number;
+  netYield: number;
+  cashOnCashReturn: number;
+  rentMultiplier: number;
 
   // Tax calculations
-  annualDepreciation: number
-  annualDeductibleInterest: number
-  annualExpenses: number
-  totalDeductibleExpenses: number
-  effectiveAnnualRent: number
-  taxableRentalIncome: number
-  annualTaxSavings: number
-  monthlyCashFlowAfterTax: number
-  annualCashFlowAfterTax: number
-}>()
+  annualDepreciation: number;
+  annualDeductibleInterest: number;
+  annualExpenses: number;
+  totalDeductibleExpenses: number;
+  effectiveAnnualRent: number;
+  taxableRentalIncome: number;
+  annualTaxSavings: number;
+  monthlyCashFlowAfterTax: number;
+  annualCashFlowAfterTax: number;
+}>();
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('de-DE', {
@@ -53,81 +53,81 @@ function formatCurrency(value: number): string {
     currency: 'EUR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(value)
+  }).format(value);
 }
 
 function formatPercent(value: number): string {
-  return value.toFixed(2) + '%'
+  return value.toFixed(2) + '%';
 }
 
 function getCashFlowColor(value: number): string {
-  if (value > 0) return 'text-green-600'
-  if (value < 0) return 'text-red-600'
-  return 'text-gray-600'
+  if (value > 0) return 'text-green-600';
+  if (value < 0) return 'text-red-600';
+  return 'text-gray-600';
 }
 
 function getYieldColor(value: number): string {
-  if (value >= 4) return 'text-green-600'
-  if (value >= 3) return 'text-yellow-600'
-  return 'text-red-600'
+  if (value >= 4) return 'text-green-600';
+  if (value >= 3) return 'text-yellow-600';
+  return 'text-red-600';
 }
 
 function getRentMultiplierColor(value: number): string {
-  if (value <= 20) return 'text-green-600'
-  if (value <= 25) return 'text-yellow-600'
-  return 'text-red-600'
+  if (value <= 20) return 'text-green-600';
+  if (value <= 25) return 'text-yellow-600';
+  return 'text-red-600';
 }
 
 // Resale calculations
 const resalePrice = computed(
   () => props.purchasePrice * Math.pow(1 + props.appreciationRate / 100, props.holdingPeriod)
-)
+);
 
-const appreciation = computed(() => resalePrice.value - props.purchasePrice)
+const appreciation = computed(() => resalePrice.value - props.purchasePrice);
 
 // Remaining loan balance after holding period (annuity formula)
 const remainingBalance = computed(() => {
-  if (props.loanAmount <= 0 || props.monthlyMortgage <= 0) return 0
+  if (props.loanAmount <= 0 || props.monthlyMortgage <= 0) return 0;
 
-  const monthlyRate = props.interestRate / 100 / 12
-  const months = props.holdingPeriod * 12
+  const monthlyRate = props.interestRate / 100 / 12;
+  const months = props.holdingPeriod * 12;
 
   if (monthlyRate === 0) {
     // No interest case: simple subtraction
-    return Math.max(0, props.loanAmount - props.monthlyMortgage * months)
+    return Math.max(0, props.loanAmount - props.monthlyMortgage * months);
   }
 
   // Remaining balance = L × (1+r)^n - P × ((1+r)^n - 1) / r
-  const factor = Math.pow(1 + monthlyRate, months)
-  const balance = props.loanAmount * factor - (props.monthlyMortgage * (factor - 1)) / monthlyRate
-  return Math.max(0, balance)
-})
+  const factor = Math.pow(1 + monthlyRate, months);
+  const balance = props.loanAmount * factor - (props.monthlyMortgage * (factor - 1)) / monthlyRate;
+  return Math.max(0, balance);
+});
 
-const principalPaid = computed(() => props.loanAmount - remainingBalance.value)
+const principalPaid = computed(() => props.loanAmount - remainingBalance.value);
 
 const totalOwnContribution = computed(() => {
   const cumulativeNegativeCashFlow =
-    props.annualCashFlowAfterTax < 0 ? -props.annualCashFlowAfterTax * props.holdingPeriod : 0
-  return props.equity + cumulativeNegativeCashFlow
-})
+    props.annualCashFlowAfterTax < 0 ? -props.annualCashFlowAfterTax * props.holdingPeriod : 0;
+  return props.equity + cumulativeNegativeCashFlow;
+});
 
-const cumulativeCashFlow = computed(() => props.annualCashFlowAfterTax * props.holdingPeriod)
+const cumulativeCashFlow = computed(() => props.annualCashFlowAfterTax * props.holdingPeriod);
 
 const saleProceeds = computed(() => {
-  return resalePrice.value - remainingBalance.value
-})
+  return resalePrice.value - remainingBalance.value;
+});
 
 const netProfitAfterSale = computed(() => {
-  return saleProceeds.value + cumulativeCashFlow.value - props.equity
-})
+  return saleProceeds.value + cumulativeCashFlow.value - props.equity;
+});
 
 const roiOnEquity = computed(() => {
-  if (totalOwnContribution.value <= 0 || props.holdingPeriod <= 0) return 0
+  if (totalOwnContribution.value <= 0 || props.holdingPeriod <= 0) return 0;
   // CAGR formula: ((endValue / startValue) ^ (1/years)) - 1
-  const totalReturn = 1 + netProfitAfterSale.value / totalOwnContribution.value
-  if (totalReturn <= 0) return -100 // Total loss
-  return (Math.pow(totalReturn, 1 / props.holdingPeriod) - 1) * 100
-})
+  const totalReturn = 1 + netProfitAfterSale.value / totalOwnContribution.value;
+  if (totalReturn <= 0) return -100; // Total loss
+  return (Math.pow(totalReturn, 1 / props.holdingPeriod) - 1) * 100;
+});
 </script>
 
 <template>

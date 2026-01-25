@@ -1,7 +1,7 @@
 export interface GermanState {
-  name: string
-  code: string
-  taxRate: number // Grunderwerbsteuer in percent
+  name: string;
+  code: string;
+  taxRate: number; // Grunderwerbsteuer in percent
 }
 
 export const germanStates: GermanState[] = [
@@ -21,8 +21,8 @@ export const germanStates: GermanState[] = [
   { name: 'Sachsen-Anhalt', code: 'ST', taxRate: 5.0 },
   { name: 'Schleswig-Holstein', code: 'SH', taxRate: 6.5 },
   { name: 'Thüringen', code: 'TH', taxRate: 5.0 },
-]
+];
 
 export function getStateByCode(code: string): GermanState | undefined {
-  return germanStates.find((state) => state.code === code)
+  return germanStates.find((state) => state.code === code);
 }

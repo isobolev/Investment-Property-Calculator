@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const appreciationRate = defineModel<number>('appreciationRate', { required: true })
-const inflationRate = defineModel<number>('inflationRate', { required: true })
-const holdingPeriod = defineModel<number>('holdingPeriod', { required: true })
+const appreciationRate = defineModel<number>('appreciationRate', { required: true });
+const inflationRate = defineModel<number>('inflationRate', { required: true });
+const holdingPeriod = defineModel<number>('holdingPeriod', { required: true });
 
-const isExpanded = ref(false)
+const isExpanded = ref(false);
 </script>
 
 <template>
