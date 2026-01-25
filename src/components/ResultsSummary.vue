@@ -113,6 +113,12 @@ const remainingBalance = computed(() => {
 
 const principalPaid = computed(() => props.loanAmount - remainingBalance.value);
 
+// Total interest paid during holding period
+const totalInterestPaid = computed(() => {
+  const totalPayments = props.monthlyMortgage * props.holdingPeriod * 12;
+  return totalPayments - principalPaid.value;
+});
+
 const totalOwnContribution = computed(() => {
   const cumulativeNegativeCashFlow =
     props.annualCashFlowAfterTax < 0 ? -props.annualCashFlowAfterTax * props.holdingPeriod : 0;
@@ -706,14 +712,13 @@ const realEstateAdvantage = computed(() => {
             <span class="text-gray-600">Resale price in {{ holdingPeriod }} years</span>
             <span class="font-medium text-emerald-700">{{ formatCurrency(resalePrice) }}</span>
           </div>
-
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-600">Sale proceeds</span>
-            <span class="font-medium text-emerald-600">{{ formatCurrency(saleProceeds) }}</span>
-          </div>
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">Remaining loan balance at the date of selling</span>
             <span class="font-medium text-red-600">{{ formatCurrency(remainingBalance) }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Sale proceeds</span>
+            <span class="font-medium text-emerald-600">{{ formatCurrency(saleProceeds) }}</span>
           </div>
           <hr class="my-2 border-emerald-200" />
           <div class="flex justify-between text-sm">
@@ -724,6 +729,11 @@ const realEstateAdvantage = computed(() => {
             <span class="text-gray-600">Principal Paid ({{ holdingPeriod }} yrs)</span>
             <span class="text-gray-700">{{ formatCurrency(principalPaid) }}</span>
           </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Interest Paid ({{ holdingPeriod }} yrs)</span>
+            <span class="text-red-600">{{ formatCurrency(totalInterestPaid) }}</span>
+          </div>
+          <hr class="my-2 border-emerald-200" />
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">Cumulative Cash Flow ({{ holdingPeriod }} yrs)</span>
             <span :class="cumulativeCashFlow >= 0 ? 'text-green-600' : 'text-red-600'">{{
@@ -743,7 +753,7 @@ const realEstateAdvantage = computed(() => {
               formatCurrency(netProfitAfterSale)
             }}</span>
           </div>
-          <p class="text-xs text-gray-500">Sale proceeds − Total Own Contribution</p>
+          <p class="text-xs text-gray-500">Sale proceeds + Cumulative Cash Flow − Equity</p>
           <div class="flex justify-between text-lg font-bold">
             <span>ROI on Equity p.a. (Eigenkapitalrendite)</span>
             <span :class="roiOnEquity >= 0 ? 'text-emerald-700' : 'text-red-600'">{{
@@ -789,7 +799,7 @@ const realEstateAdvantage = computed(() => {
             <span class="text-blue-700">{{ formatPercent(alternativeRoiAfterTax) }}</span>
           </div>
           <hr class="border-blue-200" />
-          <div class="flex justify-between font-medium">
+          <div class="flex justify-between text-lg font-bold">
             <span>Real Estate vs. Stocks/ETF</span>
             <span :class="realEstateAdvantage >= 0 ? 'text-green-600' : 'text-red-600'">
               {{ realEstateAdvantage >= 0 ? '+' : '' }}{{ formatCurrency(realEstateAdvantage) }}

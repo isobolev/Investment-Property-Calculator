@@ -19,7 +19,7 @@ const includeBroker = ref(false);
 
 // Financing inputs
 const equity = ref(50000);
-const interestRate = ref(4);
+const interestRate = ref(3.8);
 const repaymentRate = ref(1.5);
 
 // Rental inputs
