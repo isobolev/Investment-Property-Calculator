@@ -31,11 +31,8 @@ const vacancyRate = ref(0);
 // Tax inputs
 const depreciationRate = ref(2);
 const landValuePercent = ref(20);
-const taxInputMode = ref<'rate' | 'income'>('rate');
 const marginalTaxRate = ref(42);
-const taxableIncome = ref(60000);
 const includeSoli = ref(true);
-const jointTaxDeclaration = ref(false);
 
 // Assumptions
 const appreciationRate = ref(2);
@@ -68,11 +65,8 @@ const calculations = useCalculations(
   {
     depreciationRate,
     landValuePercent,
-    taxInputMode,
     marginalTaxRate,
-    taxableIncome,
     includeSoli,
-    jointTaxDeclaration,
   }
 );
 </script>
@@ -129,11 +123,8 @@ const calculations = useCalculations(
           <TaxInput
             v-model:depreciationRate="depreciationRate"
             v-model:landValuePercent="landValuePercent"
-            v-model:taxInputMode="taxInputMode"
             v-model:marginalTaxRate="marginalTaxRate"
-            v-model:taxableIncome="taxableIncome"
             v-model:includeSoli="includeSoli"
-            v-model:jointTaxDeclaration="jointTaxDeclaration"
             :buildingValue="calculations.buildingValue.value"
             :landValue="calculations.landValue.value"
             :annualDepreciation="calculations.annualDepreciation.value"

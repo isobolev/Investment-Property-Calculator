@@ -1,5 +1,4 @@
 import { computed, type Ref } from 'vue';
-import { calculateMarginalRate } from '../data/germanTaxBrackets';
 
 export interface PropertyInputs {
   purchasePrice: Ref<number>;
@@ -27,11 +26,8 @@ export interface RentalInputs {
 export interface TaxInputs {
   depreciationRate: Ref<number>;
   landValuePercent: Ref<number>;
-  taxInputMode: Ref<'rate' | 'income'>;
   marginalTaxRate: Ref<number>;
-  taxableIncome: Ref<number>;
   includeSoli: Ref<boolean>;
-  jointTaxDeclaration: Ref<boolean>;
 }
 
 export function useCalculations(
@@ -163,16 +159,7 @@ export function useCalculations(
 
   const effectiveMarginalRate = computed(() => {
     if (!tax) return 42;
-    let baseRate: number;
-    if (tax.taxInputMode.value === 'income') {
-      // Apply income splitting (Splittingverfahren) for joint tax declaration
-      const incomeForCalculation = tax.jointTaxDeclaration.value
-        ? tax.taxableIncome.value / 2
-        : tax.taxableIncome.value;
-      baseRate = calculateMarginalRate(incomeForCalculation);
-    } else {
-      baseRate = tax.marginalTaxRate.value;
-    }
+    const baseRate = tax.marginalTaxRate.value;
     // Add Solidaritätszuschlag if enabled (5.5% of the tax rate)
     if (tax.includeSoli.value) {
       return baseRate * 1.055;

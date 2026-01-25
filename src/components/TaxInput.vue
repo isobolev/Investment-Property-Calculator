@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { marginalRatePresets, calculateMarginalRate } from '../data/germanTaxBrackets';
+import { ref } from 'vue';
+import { marginalRatePresets } from '../data/germanTaxBrackets';
 
 const props = defineProps<{
   depreciationRate: number;
   landValuePercent: number;
-  taxInputMode: 'rate' | 'income';
   marginalTaxRate: number;
-  taxableIncome: number;
   includeSoli: boolean;
-  jointTaxDeclaration: boolean;
   // Calculated values for display
   buildingValue: number;
   landValue: number;
@@ -20,21 +17,11 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:depreciationRate': [value: number];
   'update:landValuePercent': [value: number];
-  'update:taxInputMode': [value: 'rate' | 'income'];
   'update:marginalTaxRate': [value: number];
-  'update:taxableIncome': [value: number];
   'update:includeSoli': [value: boolean];
-  'update:jointTaxDeclaration': [value: boolean];
 }>();
 
 const isExpanded = ref(false);
-
-const calculatedMarginalRate = computed(() => {
-  const incomeForCalculation = props.jointTaxDeclaration
-    ? props.taxableIncome / 2
-    : props.taxableIncome;
-  return calculateMarginalRate(incomeForCalculation);
-});
 
 const depreciationPresets = [
   { rate: 2, label: '2% (Standard)' },
@@ -173,39 +160,8 @@ function formatPercent(value: number): string {
         </div>
       </div>
 
-      <!-- Tax Input Mode Toggle -->
+      <!-- Marginal Tax Rate -->
       <div>
-        <label class="mb-2 block text-sm font-medium text-gray-700"> Tax Rate Input Method </label>
-        <div class="flex rounded-md shadow-sm">
-          <button
-            type="button"
-            :class="[
-              'flex-1 border px-4 py-2 text-sm font-medium',
-              taxInputMode === 'rate'
-                ? 'border-blue-600 bg-blue-600 text-white'
-                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
-            ]"
-            @click="emit('update:taxInputMode', 'rate')"
-          >
-            Direct Rate
-          </button>
-          <button
-            type="button"
-            :class="[
-              'flex-1 border-b border-r border-t px-4 py-2 text-sm font-medium',
-              taxInputMode === 'income'
-                ? 'border-blue-600 bg-blue-600 text-white'
-                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
-            ]"
-            @click="emit('update:taxInputMode', 'income')"
-          >
-            From Income
-          </button>
-        </div>
-      </div>
-
-      <!-- Direct Rate Input -->
-      <div v-if="taxInputMode === 'rate'">
         <label class="mb-1 block text-sm font-medium text-gray-700">
           Marginal Tax Rate (Grenzsteuersatz): {{ marginalTaxRate }}%
         </label>
@@ -233,48 +189,6 @@ function formatPercent(value: number): string {
           >
             {{ preset.label }}
           </button>
-        </div>
-      </div>
-
-      <!-- Income-based Rate Input -->
-      <div v-else>
-        <label class="mb-1 block text-sm font-medium text-gray-700">
-          Taxable Income (Zu versteuerndes Einkommen)
-        </label>
-        <input
-          type="number"
-          :value="taxableIncome"
-          @input="emit('update:taxableIncome', Number(($event.target as HTMLInputElement).value))"
-          min="0"
-          step="1000"
-          class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <p class="mt-1 text-sm text-gray-600">
-          Calculated marginal rate:
-          <span class="font-medium text-blue-600">{{ formatPercent(calculatedMarginalRate) }}</span>
-          <span v-if="jointTaxDeclaration" class="text-gray-500">
-            (based on {{ formatCurrency(taxableIncome / 2) }} each)</span
-          >
-        </p>
-
-        <!-- Joint Tax Declaration Checkbox -->
-        <div class="mt-3 flex items-center">
-          <input
-            type="checkbox"
-            id="jointTaxDeclaration"
-            :checked="jointTaxDeclaration"
-            @change="
-              emit('update:jointTaxDeclaration', ($event.target as HTMLInputElement).checked)
-            "
-            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          />
-          <label
-            for="jointTaxDeclaration"
-            class="ml-2 block text-sm text-gray-700"
-            title="For married couples filing jointly - income is split for tax calculation"
-          >
-            Joint tax declaration (Zusammenveranlagung)
-          </label>
         </div>
       </div>
 
