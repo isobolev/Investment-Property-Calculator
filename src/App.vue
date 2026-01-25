@@ -142,7 +142,6 @@ const calculations = useCalculations(
 
           <AssumptionsInput
             v-model:appreciationRate="appreciationRate"
-            v-model:inflationRate="inflationRate"
             v-model:holdingPeriod="holdingPeriod"
             v-model:stockReturnRate="stockReturnRate"
           />

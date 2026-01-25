@@ -2,7 +2,6 @@
 import { ref } from 'vue';
 
 const appreciationRate = defineModel<number>('appreciationRate', { required: true });
-const inflationRate = defineModel<number>('inflationRate', { required: true });
 const holdingPeriod = defineModel<number>('holdingPeriod', { required: true });
 const stockReturnRate = defineModel<number>('stockReturnRate', { required: true });
 
@@ -33,9 +32,6 @@ const isExpanded = ref(false);
         <span class="text-gray-600"
           >Appreciation:
           <span class="font-medium text-gray-900">{{ appreciationRate }}%</span></span
-        >
-        <span class="text-gray-600"
-          >Inflation: <span class="font-medium text-gray-900">{{ inflationRate }}%</span></span
         >
         <span class="text-gray-600"
           >Holding: <span class="font-medium text-gray-900">{{ holdingPeriod }} yrs</span></span
@@ -75,35 +71,6 @@ const isExpanded = ref(false);
           </div>
         </div>
         <p class="mt-1 text-xs text-gray-500">Annual property value increase</p>
-      </div>
-
-      <!-- Inflation Rate -->
-      <div>
-        <label class="mb-1 block text-sm font-medium text-gray-700">
-          Inflation Rate (Inflationsrate)
-        </label>
-        <div class="flex items-center gap-4">
-          <input
-            v-model.number="inflationRate"
-            type="range"
-            min="0"
-            max="10"
-            step="0.5"
-            class="h-2 flex-1 cursor-pointer appearance-none rounded-lg bg-gray-200"
-          />
-          <div class="flex w-24 items-center gap-1">
-            <input
-              v-model.number="inflationRate"
-              type="number"
-              min="0"
-              max="20"
-              step="0.5"
-              class="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-            />
-            <span class="text-gray-600">%</span>
-          </div>
-        </div>
-        <p class="mt-1 text-xs text-gray-500">Expected annual inflation (affects rent increases)</p>
       </div>
 
       <!-- Holding Period -->
