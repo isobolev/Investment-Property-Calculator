@@ -790,18 +790,24 @@ const realEstateAdvantage = computed(() => {
             <span class="text-gray-600">- Capital gains tax (26.375%)</span>
             <span class="text-red-600">-{{ formatCurrency(alternativeCapitalGainsTax) }}</span>
           </div>
-          <div class="flex justify-between text-sm font-medium">
-            <span class="text-gray-700">Net profit after tax</span>
+          <hr class="my-2 border-blue-200" />
+          <div class="flex justify-between text-lg font-bold">
+            <span>Net profit after tax</span>
             <span class="text-blue-700">{{ formatCurrency(alternativeNetProfitAfterTax) }}</span>
           </div>
-          <div class="flex justify-between text-sm font-medium">
-            <span class="text-gray-700">ROI p.a. after tax (CAGR)</span>
+          <p class="text-xs text-gray-500">Portfolio value − Total contributions − Capital gains tax</p>
+          <div class="flex justify-between text-lg font-bold">
+            <span>ROI p.a. after tax (CAGR)</span>
             <span class="text-blue-700">{{ formatPercent(alternativeRoiAfterTax) }}</span>
           </div>
-          <hr class="border-blue-200" />
+          <p class="text-xs text-gray-500">CAGR: Compound annual growth rate on your investment</p>
+        </div>
+
+        <!-- Comparison -->
+        <div class="mt-4 rounded-md border-2 p-4" :class="realEstateAdvantage >= 0 ? 'border-emerald-300 bg-emerald-50' : 'border-red-300 bg-red-50'">
           <div class="flex justify-between text-lg font-bold">
             <span>Real Estate vs. Stocks/ETF</span>
-            <span :class="realEstateAdvantage >= 0 ? 'text-green-600' : 'text-red-600'">
+            <span :class="realEstateAdvantage >= 0 ? 'text-emerald-700' : 'text-red-600'">
               {{ realEstateAdvantage >= 0 ? '+' : '' }}{{ formatCurrency(realEstateAdvantage) }}
             </span>
           </div>
