@@ -23,7 +23,7 @@ const interestRate = ref(4);
 const repaymentRate = ref(1.5);
 
 // Rental inputs
-const monthlyRent = ref(1200);
+const monthlyRent = ref(1000);
 const monthlyHausgeld = ref(150);
 const maintenanceReserve = ref(50);
 const vacancyRate = ref(0);
@@ -41,6 +41,7 @@ const jointTaxDeclaration = ref(false);
 const appreciationRate = ref(2);
 const inflationRate = ref(2);
 const holdingPeriod = ref(10);
+const stockReturnRate = ref(7);
 
 // Calculate everything
 const calculations = useCalculations(
@@ -93,6 +94,9 @@ const calculations = useCalculations(
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <!-- Left Column: Inputs -->
         <div class="space-y-6">
+          <h2 class="text-xl font-semibold text-gray-700">
+            Investment Parameters (Investitionsparameter)
+          </h2>
           <PropertyInput
             v-model:purchasePrice="purchasePrice"
             v-model:stateCode="stateCode"
@@ -140,11 +144,15 @@ const calculations = useCalculations(
             v-model:appreciationRate="appreciationRate"
             v-model:inflationRate="inflationRate"
             v-model:holdingPeriod="holdingPeriod"
+            v-model:stockReturnRate="stockReturnRate"
           />
         </div>
 
         <!-- Right Column: Results -->
-        <div class="lg:sticky lg:top-8 lg:self-start">
+        <div class="space-y-6 lg:sticky lg:top-8 lg:self-start">
+          <h2 class="text-xl font-semibold text-gray-700">
+            Analysis & Results (Analyse & Ergebnisse)
+          </h2>
           <ResultsSummary
             :purchasePrice="purchasePrice"
             :transferTax="calculations.transferTax.value"
@@ -178,13 +186,22 @@ const calculations = useCalculations(
             :annualTaxSavings="calculations.annualTaxSavings.value"
             :monthlyCashFlowAfterTax="calculations.monthlyCashFlowAfterTax.value"
             :annualCashFlowAfterTax="calculations.annualCashFlowAfterTax.value"
+            :stockReturnRate="stockReturnRate"
           />
         </div>
       </div>
 
       <!-- Footer -->
       <div class="mt-8 text-center text-sm text-gray-500">
-        <p>
+        <!-- Legend -->
+        <div class="space-y-1 px-2 text-xs text-gray-500">
+          <p>
+            <span class="font-medium text-green-600">Green</span>: Good values |
+            <span class="font-medium text-yellow-600">Yellow</span>: Acceptable |
+            <span class="font-medium text-red-600">Red</span>: Critical
+          </p>
+        </div>
+        <p class="mt-2">
           This calculation is for informational purposes only and does not replace professional
           advice.
         </p>

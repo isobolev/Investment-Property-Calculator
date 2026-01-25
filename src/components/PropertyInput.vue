@@ -63,14 +63,8 @@ const totalCosts = computed(() => (purchasePrice.value * totalCostsRate.value) /
           <span class="font-medium text-gray-900">{{ formatCurrency(purchasePrice) }}</span></span
         >
         <span class="text-gray-600"
-          >Costs:
+          >Closing Costs:
           <span class="font-medium text-gray-900">{{ totalCostsRate.toFixed(1) }}%</span></span
-        >
-        <span class="text-gray-600"
-          >Total:
-          <span class="font-medium text-blue-600">{{
-            formatCurrency(purchasePrice + totalCosts)
-          }}</span></span
         >
       </div>
     </div>

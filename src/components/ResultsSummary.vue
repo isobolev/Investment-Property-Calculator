@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 
 const props = defineProps<{
   // Purchase costs
@@ -15,6 +15,7 @@ const props = defineProps<{
   // Assumptions
   appreciationRate: number;
   holdingPeriod: number;
+  stockReturnRate: number;
 
   // Financing
   equity: number;
@@ -46,6 +47,13 @@ const props = defineProps<{
   monthlyCashFlowAfterTax: number;
   annualCashFlowAfterTax: number;
 }>();
+
+// Section expanded states
+const purchaseCostsExpanded = ref(false);
+const taxBenefitsExpanded = ref(false);
+const cashFlowExpanded = ref(false);
+const keyMetricsExpanded = ref(false);
+const resaleExpanded = ref(false);
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('de-DE', {
@@ -128,16 +136,117 @@ const roiOnEquity = computed(() => {
   if (totalReturn <= 0) return -100; // Total loss
   return (Math.pow(totalReturn, 1 / props.holdingPeriod) - 1) * 100;
 });
+
+// Alternative investment (stocks/ETF) comparison
+// Simulates: invest equity initially, then add monthly contributions only if RE cash flow is negative
+// (positive RE cash flow is income you wouldn't have with stocks, so no withdrawal)
+const alternativeInvestmentValue = computed(() => {
+  const monthlyRate = props.stockReturnRate / 100 / 12;
+  const months = props.holdingPeriod * 12;
+  // Only contribute when RE cash flow is negative (money you'd save by not owning RE)
+  const monthlyContribution = Math.max(0, -props.monthlyCashFlowAfterTax);
+
+  if (monthlyRate === 0) {
+    // No return case: simple sum
+    return props.equity + monthlyContribution * months;
+  }
+
+  // Future Value = PV * (1+r)^n + PMT * ((1+r)^n - 1) / r
+  // PV = initial equity
+  // PMT = monthly contribution (only if RE has negative cash flow)
+  const compoundFactor = Math.pow(1 + monthlyRate, months);
+  const fvLumpSum = props.equity * compoundFactor;
+  const fvAnnuity = monthlyContribution * ((compoundFactor - 1) / monthlyRate);
+
+  return fvLumpSum + fvAnnuity;
+});
+
+// Total contributions to alternative investment = equity + monthly contributions (only if negative CF)
+const alternativeTotalContribution = computed(() => {
+  const monthlyContribution = Math.max(0, -props.monthlyCashFlowAfterTax);
+  const months = props.holdingPeriod * 12;
+  return props.equity + monthlyContribution * months;
+});
+
+const alternativeInvestmentProfit = computed(() => {
+  return alternativeInvestmentValue.value - alternativeTotalContribution.value;
+});
+
+// German capital gains tax: 25% + 5.5% Soli = 26.375%
+const capitalGainsTaxRate = 0.26375;
+const alternativeCapitalGainsTax = computed(() => {
+  if (alternativeInvestmentProfit.value <= 0) return 0;
+  return alternativeInvestmentProfit.value * capitalGainsTaxRate;
+});
+
+const alternativeNetProfitAfterTax = computed(() => {
+  return alternativeInvestmentProfit.value - alternativeCapitalGainsTax.value;
+});
+
+const alternativeRoiAfterTax = computed(() => {
+  if (alternativeTotalContribution.value <= 0 || props.holdingPeriod <= 0) return 0;
+  // CAGR formula: ((endValue / startValue) ^ (1/years)) - 1
+  const totalReturn = 1 + alternativeNetProfitAfterTax.value / alternativeTotalContribution.value;
+  if (totalReturn <= 0) return -100;
+  return (Math.pow(totalReturn, 1 / props.holdingPeriod) - 1) * 100;
+});
+
+const realEstateAdvantage = computed(() => {
+  return netProfitAfterSale.value - alternativeNetProfitAfterTax.value;
+});
 </script>
 
 <template>
-  <div class="rounded-lg bg-white p-6 shadow-md">
-    <h2 class="mb-4 text-xl font-semibold text-gray-800">Results Summary (Ergebnisübersicht)</h2>
+  <div class="space-y-6">
+    <!-- Purchase Costs Breakdown -->
+    <div class="overflow-hidden rounded-lg bg-white shadow-md">
+      <button
+        @click="purchaseCostsExpanded = !purchaseCostsExpanded"
+        class="flex w-full items-center justify-between p-4 transition-colors hover:bg-gray-50"
+      >
+        <h3 class="text-lg font-semibold text-gray-800">Purchase Costs (Kaufnebenkosten)</h3>
+        <svg
+          :class="[
+            'h-5 w-5 text-gray-500 transition-transform',
+            purchaseCostsExpanded ? 'rotate-180' : '',
+          ]"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
 
-    <div class="space-y-6">
-      <!-- Purchase Costs Breakdown -->
-      <div>
-        <h3 class="mb-2 text-lg font-medium text-gray-700">Purchase Costs (Kaufnebenkosten)</h3>
+      <!-- Summary -->
+      <div v-if="!purchaseCostsExpanded" class="-mt-2 px-4 pb-4">
+        <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+          <span class="text-gray-600"
+            >Price:
+            <span class="font-medium text-gray-900">{{ formatCurrency(purchasePrice) }}</span></span
+          >
+          <span class="text-gray-600">
+            Costs:
+            <span class="font-medium text-gray-900">
+              {{ formatCurrency(totalPurchaseCosts) }}
+            </span>
+          </span>
+          <span class="text-gray-600"
+            >Total:
+            <span class="font-medium text-blue-600">{{
+              formatCurrency(totalInvestment)
+            }}</span></span
+          >
+        </div>
+      </div>
+
+      <!-- Expanded Content -->
+      <div v-if="purchaseCostsExpanded" class="space-y-2 px-6 pb-6">
         <div class="space-y-2 rounded-md bg-gray-50 p-4">
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">Purchase Price (Kaufpreis)</span>
@@ -175,10 +284,57 @@ const roiOnEquity = computed(() => {
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Tax Benefits -->
-      <div>
-        <h3 class="mb-2 text-lg font-medium text-gray-700">Tax Benefits (Steuerliche Vorteile)</h3>
+    <!-- Tax Benefits -->
+    <div class="overflow-hidden rounded-lg bg-white shadow-md">
+      <button
+        @click="taxBenefitsExpanded = !taxBenefitsExpanded"
+        class="flex w-full items-center justify-between p-4 transition-colors hover:bg-gray-50"
+      >
+        <h3 class="text-lg font-semibold text-gray-800">Tax Benefits (Steuerliche Vorteile)</h3>
+        <svg
+          :class="[
+            'h-5 w-5 text-gray-500 transition-transform',
+            taxBenefitsExpanded ? 'rotate-180' : '',
+          ]"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
+
+      <!-- Summary -->
+      <div v-if="!taxBenefitsExpanded" class="-mt-2 px-4 pb-4">
+        <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+          <span class="text-gray-600"
+            >Taxable Income:
+            <span
+              class="font-medium"
+              :class="taxableRentalIncome < 0 ? 'text-green-600' : 'text-red-600'"
+              >{{ formatCurrency(taxableRentalIncome) }}/yr</span
+            ></span
+          >
+          <span class="text-gray-600"
+            >{{ annualTaxSavings >= 0 ? 'Tax Savings' : 'Tax Due' }}:
+            <span
+              class="font-medium"
+              :class="annualTaxSavings >= 0 ? 'text-green-600' : 'text-red-600'"
+              >{{ formatCurrency(Math.abs(annualTaxSavings)) }}/yr</span
+            ></span
+          >
+        </div>
+      </div>
+
+      <!-- Expanded Content -->
+      <div v-if="taxBenefitsExpanded" class="space-y-2 px-6 pb-6">
         <div class="space-y-2 rounded-md bg-gray-50 p-4">
           <!-- Header -->
           <div class="flex justify-between text-xs font-medium text-gray-500">
@@ -270,12 +426,55 @@ const roiOnEquity = computed(() => {
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Cash Flow -->
-      <div>
-        <h3 class="mb-2 text-lg font-medium text-gray-700">
-          Monthly Cash Flow (Monatlicher Cashflow)
-        </h3>
+    <!-- Cash Flow -->
+    <div class="overflow-hidden rounded-lg bg-white shadow-md">
+      <button
+        @click="cashFlowExpanded = !cashFlowExpanded"
+        class="flex w-full items-center justify-between p-4 transition-colors hover:bg-gray-50"
+      >
+        <h3 class="text-lg font-semibold text-gray-800">Cash Flow (Monatlicher Cashflow)</h3>
+        <svg
+          :class="[
+            'h-5 w-5 text-gray-500 transition-transform',
+            cashFlowExpanded ? 'rotate-180' : '',
+          ]"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
+
+      <!-- Summary -->
+      <div v-if="!cashFlowExpanded" class="-mt-2 px-4 pb-4">
+        <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+          <span class="text-gray-600"
+            >Before Tax:
+            <span class="font-medium" :class="getCashFlowColor(monthlyCashFlow)">{{
+              formatCurrency(monthlyCashFlow)
+            }}</span
+            >/mo</span
+          >
+          <span class="text-gray-600"
+            >After Tax:
+            <span class="font-medium" :class="getCashFlowColor(monthlyCashFlowAfterTax)">{{
+              formatCurrency(monthlyCashFlowAfterTax)
+            }}</span
+            >/mo</span
+          >
+        </div>
+      </div>
+
+      <!-- Expanded Content -->
+      <div v-if="cashFlowExpanded" class="space-y-2 px-6 pb-6">
         <div class="space-y-2 rounded-md bg-gray-50 p-4">
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">+ Rental Income (effective)</span>
@@ -326,10 +525,65 @@ const roiOnEquity = computed(() => {
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Key Metrics -->
-      <div>
-        <h3 class="mb-2 text-lg font-medium text-gray-700">Key Metrics (Kennzahlen)</h3>
+    <!-- Key Metrics -->
+    <div class="overflow-hidden rounded-lg bg-white shadow-md">
+      <button
+        @click="keyMetricsExpanded = !keyMetricsExpanded"
+        class="flex w-full items-center justify-between p-4 transition-colors hover:bg-gray-50"
+      >
+        <h3 class="text-lg font-semibold text-gray-800">Key Metrics (Kennzahlen)</h3>
+        <svg
+          :class="[
+            'h-5 w-5 text-gray-500 transition-transform',
+            keyMetricsExpanded ? 'rotate-180' : '',
+          ]"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
+
+      <!-- Summary -->
+      <div v-if="!keyMetricsExpanded" class="-mt-2 px-4 pb-4">
+        <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+          <span class="text-gray-600"
+            >Gross:
+            <span class="font-medium" :class="getYieldColor(grossYield)">{{
+              formatPercent(grossYield)
+            }}</span></span
+          >
+          <span class="text-gray-600"
+            >Net:
+            <span class="font-medium" :class="getYieldColor(netYield)">{{
+              formatPercent(netYield)
+            }}</span></span
+          >
+          <span class="text-gray-600"
+            >CoC:
+            <span class="font-medium" :class="getCashFlowColor(cashOnCashReturn)">{{
+              formatPercent(cashOnCashReturn)
+            }}</span></span
+          >
+          <span class="text-gray-600"
+            >Factor:
+            <span class="font-medium" :class="getRentMultiplierColor(rentMultiplier)"
+              >{{ rentMultiplier.toFixed(1) }}x</span
+            ></span
+          >
+        </div>
+      </div>
+
+      <!-- Expanded Content -->
+      <div v-if="keyMetricsExpanded" class="px-6 pb-6">
         <div class="grid grid-cols-2 gap-3">
           <!-- Gross Yield -->
           <div class="group relative cursor-help rounded-md bg-blue-50 p-3 text-center">
@@ -390,12 +644,64 @@ const roiOnEquity = computed(() => {
             </div>
           </div>
         </div>
+        <div class="space-y-1 px-2 pt-4 text-xs text-gray-500">
+          <p>Gross Yield: &gt;4% good | Rent Multiplier: &lt;20 good, &lt;25 acceptable</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resale Price -->
+    <div class="overflow-hidden rounded-lg bg-white shadow-md">
+      <button
+        @click="resaleExpanded = !resaleExpanded"
+        class="flex w-full items-center justify-between p-4 transition-colors hover:bg-gray-50"
+      >
+        <h3 class="text-lg font-semibold text-gray-800">
+          Net profit and ROI in {{ holdingPeriod }} yrs
+        </h3>
+        <svg
+          :class="[
+            'h-5 w-5 text-gray-500 transition-transform',
+            resaleExpanded ? 'rotate-180' : '',
+          ]"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
+
+      <!-- Summary -->
+      <div v-if="!resaleExpanded" class="-mt-2 px-4 pb-4">
+        <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+          <span class="text-gray-600"
+            >Net Profit:
+            <span
+              class="font-medium"
+              :class="netProfitAfterSale >= 0 ? 'text-emerald-600' : 'text-red-600'"
+              >{{ formatCurrency(netProfitAfterSale) }}</span
+            ></span
+          >
+          <span class="text-gray-600"
+            >ROI p.a.:
+            <span
+              class="font-medium"
+              :class="roiOnEquity >= 0 ? 'text-emerald-600' : 'text-red-600'"
+              >{{ formatPercent(roiOnEquity) }}</span
+            ></span
+          >
+        </div>
       </div>
 
-      <!-- Resale Price -->
-      <div>
-        <h3 class="mb-2 text-lg font-medium text-gray-700">Resale Price (Verkaufspreis)</h3>
-        <div class="mt-3 space-y-2 rounded-md bg-emerald-50 p-4">
+      <!-- Expanded Content -->
+      <div v-if="resaleExpanded" class="space-y-2 px-6 pb-6">
+        <div class="space-y-2 rounded-md bg-emerald-50 p-4">
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">Resale price in {{ holdingPeriod }} years</span>
             <span class="font-medium text-emerald-700">{{ formatCurrency(resalePrice) }}</span>
@@ -446,16 +752,54 @@ const roiOnEquity = computed(() => {
           </div>
           <p class="text-xs text-gray-500">CAGR: Compound annual growth rate on your investment</p>
         </div>
-      </div>
 
-      <!-- Legend -->
-      <div class="space-y-1 text-xs text-gray-500">
-        <p>
-          <span class="font-medium text-green-600">Green</span>: Good values |
-          <span class="font-medium text-yellow-600">Yellow</span>: Acceptable |
-          <span class="font-medium text-red-600">Red</span>: Critical
-        </p>
-        <p>Gross Yield: &gt;5% good | Rent Multiplier: &lt;20 good, &lt;25 acceptable</p>
+        <!-- Alternative Investment Comparison -->
+        <div class="mt-4 space-y-2 rounded-md bg-blue-50 p-4">
+          <p class="text-sm font-medium text-blue-800">
+            Alternative: Stocks/ETF ({{ stockReturnRate }}% p.a.)
+          </p>
+          <p class="text-xs text-gray-500">
+            Equity + monthly contributions invested in stocks (if RE cash flow after tax is
+            negative)
+          </p>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Total contributions</span>
+            <span class="text-gray-700">{{ formatCurrency(alternativeTotalContribution) }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Portfolio value after {{ holdingPeriod }} yrs</span>
+            <span class="font-medium text-blue-700">{{
+              formatCurrency(alternativeInvestmentValue)
+            }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Gross profit from stocks/ETF</span>
+            <span class="text-blue-600">{{ formatCurrency(alternativeInvestmentProfit) }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">- Capital gains tax (26.375%)</span>
+            <span class="text-red-600">-{{ formatCurrency(alternativeCapitalGainsTax) }}</span>
+          </div>
+          <div class="flex justify-between text-sm font-medium">
+            <span class="text-gray-700">Net profit after tax</span>
+            <span class="text-blue-700">{{ formatCurrency(alternativeNetProfitAfterTax) }}</span>
+          </div>
+          <div class="flex justify-between text-sm font-medium">
+            <span class="text-gray-700">ROI p.a. after tax (CAGR)</span>
+            <span class="text-blue-700">{{ formatPercent(alternativeRoiAfterTax) }}</span>
+          </div>
+          <hr class="border-blue-200" />
+          <div class="flex justify-between font-medium">
+            <span>Real Estate vs. Stocks/ETF</span>
+            <span :class="realEstateAdvantage >= 0 ? 'text-green-600' : 'text-red-600'">
+              {{ realEstateAdvantage >= 0 ? '+' : '' }}{{ formatCurrency(realEstateAdvantage) }}
+            </span>
+          </div>
+          <p class="text-xs text-gray-500">
+            {{ realEstateAdvantage >= 0 ? 'Real estate outperforms' : 'Stocks/ETF outperforms' }} by
+            {{ formatCurrency(Math.abs(realEstateAdvantage)) }} (RE is tax-free after 10 yrs)
+          </p>
+        </div>
       </div>
     </div>
   </div>
