@@ -19,11 +19,11 @@ const includeBroker = ref(false)
 
 // Financing inputs
 const equity = ref(50000)
-const interestRate = ref(3.8)
+const interestRate = ref(4)
 const repaymentRate = ref(1.5)
 
 // Rental inputs
-const monthlyRent = ref(1200)
+const monthlyRent = ref(1000)
 const monthlyHausgeld = ref(150)
 const maintenanceReserve = ref(50)
 const vacancyRate = ref(0)

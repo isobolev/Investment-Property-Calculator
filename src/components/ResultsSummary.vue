@@ -104,6 +104,19 @@ const remainingBalance = computed(() => {
 })
 
 const principalPaid = computed(() => props.loanAmount - remainingBalance.value)
+
+const totalOwnContribution = computed(() => {
+  const cumulativeNegativeCashFlow =
+    props.annualCashFlowAfterTax < 0 ? -props.annualCashFlowAfterTax * props.holdingPeriod : 0
+  return props.equity + cumulativeNegativeCashFlow
+})
+
+const cumulativeCashFlow = computed(() => props.annualCashFlowAfterTax * props.holdingPeriod)
+
+const netProfitAfterSale = computed(() => {
+  const saleProceeds = resalePrice.value - remainingBalance.value
+  return saleProceeds + cumulativeCashFlow.value - props.equity
+})
 </script>
 
 <template>
@@ -148,37 +161,6 @@ const principalPaid = computed(() => props.loanAmount - remainingBalance.value)
           <div class="flex justify-between text-lg font-bold">
             <span>Total Investment (Gesamtinvestition)</span>
             <span class="text-blue-600">{{ formatCurrency(totalInvestment) }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Resale Price -->
-      <div>
-        <h3 class="mb-2 text-lg font-medium text-gray-700">Resale Price (Verkaufspreis)</h3>
-        <div class="mt-3 space-y-2 rounded-md bg-emerald-50 p-4">
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-600">Resale price in {{ holdingPeriod }} years</span>
-            <span class="font-medium text-emerald-700">{{ formatCurrency(resalePrice) }}</span>
-          </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-600">Appreciation ({{ appreciationRate }}% p.a.)</span>
-            <span class="text-emerald-600">+{{ formatCurrency(appreciation) }}</span>
-          </div>
-          <p class="text-xs text-gray-500">
-            {{
-              holdingPeriod >= 10
-                ? 'Tax-free sale possible (Spekulationsfrist)'
-                : `${10 - holdingPeriod} more years until tax-free sale`
-            }}
-          </p>
-          <hr class="my-2 border-emerald-200" />
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-600">Remaining loan balance at the date of selling</span>
-            <span class="font-medium text-red-600">{{ formatCurrency(remainingBalance) }}</span>
-          </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-600">Principal Paid ({{ holdingPeriod }} yrs)</span>
-            <span class="text-gray-700">{{ formatCurrency(principalPaid) }}</span>
           </div>
         </div>
       </div>
@@ -396,6 +378,59 @@ const principalPaid = computed(() => props.loanAmount - remainingBalance.value)
               acceptable.
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Resale Price -->
+      <div>
+        <h3 class="mb-2 text-lg font-medium text-gray-700">Resale Price (Verkaufspreis)</h3>
+        <div class="mt-3 space-y-2 rounded-md bg-emerald-50 p-4">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Resale price in {{ holdingPeriod }} years</span>
+            <span class="font-medium text-emerald-700">{{ formatCurrency(resalePrice) }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Appreciation ({{ appreciationRate }}% p.a.)</span>
+            <span class="text-emerald-600">+{{ formatCurrency(appreciation) }}</span>
+          </div>
+          <p class="text-xs text-gray-500">
+            {{
+              holdingPeriod >= 10
+                ? 'Tax-free sale possible (Spekulationsfrist)'
+                : `${10 - holdingPeriod} more years until tax-free sale`
+            }}
+          </p>
+          <hr class="my-2 border-emerald-200" />
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Remaining loan balance at the date of selling</span>
+            <span class="font-medium text-red-600">{{ formatCurrency(remainingBalance) }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Principal Paid ({{ holdingPeriod }} yrs)</span>
+            <span class="text-gray-700">{{ formatCurrency(principalPaid) }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Cumulative Cash Flow ({{ holdingPeriod }} yrs)</span>
+            <span :class="cumulativeCashFlow >= 0 ? 'text-green-600' : 'text-red-600'">{{
+              formatCurrency(cumulativeCashFlow)
+            }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Total Own Contribution (Equity + Negative Cash Flow)</span>
+            <span class="font-medium text-gray-700">{{
+              formatCurrency(totalOwnContribution)
+            }}</span>
+          </div>
+          <hr class="my-2 border-emerald-200" />
+          <div class="flex justify-between text-lg font-bold">
+            <span>Net Profit (Nettogewinn)</span>
+            <span :class="netProfitAfterSale >= 0 ? 'text-emerald-700' : 'text-red-600'">{{
+              formatCurrency(netProfitAfterSale)
+            }}</span>
+          </div>
+          <p class="text-xs text-gray-500">
+            Sale proceeds − equity + cumulative cash flow (tax-free after 10 years)
+          </p>
         </div>
       </div>
 
