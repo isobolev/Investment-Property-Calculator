@@ -53,7 +53,7 @@ const isExpanded = ref(false);
           <input
             v-model.number="appreciationRate"
             type="range"
-            min="0"
+            min="-5"
             max="10"
             step="0.5"
             class="h-2 flex-1 cursor-pointer appearance-none rounded-lg bg-gray-200"
@@ -62,15 +62,15 @@ const isExpanded = ref(false);
             <input
               v-model.number="appreciationRate"
               type="number"
-              min="0"
-              max="20"
+              min="-5"
+              max="10"
               step="0.5"
               class="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
             />
             <span class="text-gray-600">%</span>
           </div>
         </div>
-        <p class="mt-1 text-xs text-gray-500">Annual property value increase</p>
+        <p class="mt-1 text-xs text-gray-500">Annual property value change (negative = depreciation)</p>
       </div>
 
       <!-- Holding Period -->
