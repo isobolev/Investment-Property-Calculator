@@ -2,6 +2,8 @@
 
 A comprehensive Vue.js calculator for analyzing real estate investment returns in Germany (Buy to Let investment). Compare property investment with stocks/ETFs alternative, accounting for taxes and financing.
 
+![Screenshot](assets/screenshot.png)
+
 ## Features
 
 ### Investment Parameters
