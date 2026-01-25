@@ -23,7 +23,7 @@ const interestRate = ref(4)
 const repaymentRate = ref(1.5)
 
 // Rental inputs
-const monthlyRent = ref(1000)
+const monthlyRent = ref(1200)
 const monthlyHausgeld = ref(150)
 const maintenanceReserve = ref(50)
 const vacancyRate = ref(0)

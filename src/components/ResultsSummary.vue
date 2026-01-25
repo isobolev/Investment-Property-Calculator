@@ -113,9 +113,20 @@ const totalOwnContribution = computed(() => {
 
 const cumulativeCashFlow = computed(() => props.annualCashFlowAfterTax * props.holdingPeriod)
 
+const saleProceeds = computed(() => {
+  return resalePrice.value - remainingBalance.value
+})
+
 const netProfitAfterSale = computed(() => {
-  const saleProceeds = resalePrice.value - remainingBalance.value
-  return saleProceeds + cumulativeCashFlow.value - props.equity
+  return saleProceeds.value + cumulativeCashFlow.value - props.equity
+})
+
+const roiOnEquity = computed(() => {
+  if (totalOwnContribution.value <= 0 || props.holdingPeriod <= 0) return 0
+  // CAGR formula: ((endValue / startValue) ^ (1/years)) - 1
+  const totalReturn = 1 + netProfitAfterSale.value / totalOwnContribution.value
+  if (totalReturn <= 0) return -100 // Total loss
+  return (Math.pow(totalReturn, 1 / props.holdingPeriod) - 1) * 100
 })
 </script>
 
@@ -389,21 +400,19 @@ const netProfitAfterSale = computed(() => {
             <span class="text-gray-600">Resale price in {{ holdingPeriod }} years</span>
             <span class="font-medium text-emerald-700">{{ formatCurrency(resalePrice) }}</span>
           </div>
+
           <div class="flex justify-between text-sm">
-            <span class="text-gray-600">Appreciation ({{ appreciationRate }}% p.a.)</span>
-            <span class="text-emerald-600">+{{ formatCurrency(appreciation) }}</span>
+            <span class="text-gray-600">Sale proceeds</span>
+            <span class="font-medium text-emerald-600">{{ formatCurrency(saleProceeds) }}</span>
           </div>
-          <p class="text-xs text-gray-500">
-            {{
-              holdingPeriod >= 10
-                ? 'Tax-free sale possible (Spekulationsfrist)'
-                : `${10 - holdingPeriod} more years until tax-free sale`
-            }}
-          </p>
-          <hr class="my-2 border-emerald-200" />
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">Remaining loan balance at the date of selling</span>
             <span class="font-medium text-red-600">{{ formatCurrency(remainingBalance) }}</span>
+          </div>
+          <hr class="my-2 border-emerald-200" />
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Appreciation ({{ appreciationRate }}% p.a.)</span>
+            <span class="text-emerald-600">+{{ formatCurrency(appreciation) }}</span>
           </div>
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">Principal Paid ({{ holdingPeriod }} yrs)</span>
@@ -428,9 +437,14 @@ const netProfitAfterSale = computed(() => {
               formatCurrency(netProfitAfterSale)
             }}</span>
           </div>
-          <p class="text-xs text-gray-500">
-            Sale proceeds − equity + cumulative cash flow (tax-free after 10 years)
-          </p>
+          <p class="text-xs text-gray-500">Sale proceeds − Total Own Contribution</p>
+          <div class="flex justify-between text-lg font-bold">
+            <span>ROI on Equity p.a. (Eigenkapitalrendite)</span>
+            <span :class="roiOnEquity >= 0 ? 'text-emerald-700' : 'text-red-600'">{{
+              formatPercent(roiOnEquity)
+            }}</span>
+          </div>
+          <p class="text-xs text-gray-500">CAGR: Compound annual growth rate on your investment</p>
         </div>
       </div>
 
