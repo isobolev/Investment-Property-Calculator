@@ -41,16 +41,16 @@ export function useCalculations(
   tax?: TaxInputs
 ) {
   // Purchase costs (Kaufnebenkosten)
-  const transferTax = computed(() =>
-    property.purchasePrice.value * (property.stateTaxRate.value / 100)
+  const transferTax = computed(
+    () => property.purchasePrice.value * (property.stateTaxRate.value / 100)
   )
 
-  const notaryFees = computed(() =>
-    property.purchasePrice.value * (property.notaryRate.value / 100)
+  const notaryFees = computed(
+    () => property.purchasePrice.value * (property.notaryRate.value / 100)
   )
 
-  const landRegistryFees = computed(() =>
-    property.purchasePrice.value * (property.landRegistryRate.value / 100)
+  const landRegistryFees = computed(
+    () => property.purchasePrice.value * (property.landRegistryRate.value / 100)
   )
 
   const brokerFees = computed(() =>
@@ -59,8 +59,8 @@ export function useCalculations(
       : 0
   )
 
-  const totalPurchaseCosts = computed(() =>
-    transferTax.value + notaryFees.value + landRegistryFees.value + brokerFees.value
+  const totalPurchaseCosts = computed(
+    () => transferTax.value + notaryFees.value + landRegistryFees.value + brokerFees.value
   )
 
   const purchaseCostsRate = computed(() =>
@@ -70,19 +70,13 @@ export function useCalculations(
   )
 
   // Total investment
-  const totalInvestment = computed(() =>
-    property.purchasePrice.value + totalPurchaseCosts.value
-  )
+  const totalInvestment = computed(() => property.purchasePrice.value + totalPurchaseCosts.value)
 
   // Financing
-  const loanAmount = computed(() =>
-    Math.max(0, totalInvestment.value - financing.equity.value)
-  )
+  const loanAmount = computed(() => Math.max(0, totalInvestment.value - financing.equity.value))
 
   const loanToValue = computed(() =>
-    property.purchasePrice.value > 0
-      ? (loanAmount.value / property.purchasePrice.value) * 100
-      : 0
+    property.purchasePrice.value > 0 ? (loanAmount.value / property.purchasePrice.value) * 100 : 0
   )
 
   // Monthly mortgage payment (annuity formula)
@@ -102,52 +96,44 @@ export function useCalculations(
   })
 
   // Rental income
-  const effectiveMonthlyRent = computed(() =>
-    rental.monthlyRent.value * (1 - rental.vacancyRate.value / 100)
+  const effectiveMonthlyRent = computed(
+    () => rental.monthlyRent.value * (1 - rental.vacancyRate.value / 100)
   )
 
   const annualRent = computed(() => rental.monthlyRent.value * 12)
   const effectiveAnnualRent = computed(() => effectiveMonthlyRent.value * 12)
 
   // Monthly expenses (non-recoverable)
-  const monthlyExpenses = computed(() =>
-    rental.monthlyHausgeld.value + rental.maintenanceReserve.value
+  const monthlyExpenses = computed(
+    () => rental.monthlyHausgeld.value + rental.maintenanceReserve.value
   )
 
   const annualExpenses = computed(() => monthlyExpenses.value * 12)
 
   // Cash flow
-  const monthlyCashFlow = computed(() =>
-    effectiveMonthlyRent.value - monthlyExpenses.value - monthlyMortgage.value
+  const monthlyCashFlow = computed(
+    () => effectiveMonthlyRent.value - monthlyExpenses.value - monthlyMortgage.value
   )
 
   const annualCashFlow = computed(() => monthlyCashFlow.value * 12)
 
   // Net operating income (before financing)
-  const monthlyNOI = computed(() =>
-    effectiveMonthlyRent.value - monthlyExpenses.value
-  )
+  const monthlyNOI = computed(() => effectiveMonthlyRent.value - monthlyExpenses.value)
 
   const annualNOI = computed(() => monthlyNOI.value * 12)
 
   // Yields
   const grossYield = computed(() =>
-    property.purchasePrice.value > 0
-      ? (annualRent.value / property.purchasePrice.value) * 100
-      : 0
+    property.purchasePrice.value > 0 ? (annualRent.value / property.purchasePrice.value) * 100 : 0
   )
 
   const netYield = computed(() =>
-    totalInvestment.value > 0
-      ? (annualNOI.value / totalInvestment.value) * 100
-      : 0
+    totalInvestment.value > 0 ? (annualNOI.value / totalInvestment.value) * 100 : 0
   )
 
   // Rent multiplier (Kaufpreisfaktor)
   const rentMultiplier = computed(() =>
-    annualRent.value > 0
-      ? property.purchasePrice.value / annualRent.value
-      : 0
+    annualRent.value > 0 ? property.purchasePrice.value / annualRent.value : 0
   )
 
   // Tax calculations (only computed if tax inputs provided)
@@ -159,8 +145,8 @@ export function useCalculations(
   // Total acquisition costs (Anschaffungskosten) for depreciation base
   // Includes purchase price + Anschaffungsnebenkosten (transfer tax, notary fees, land registry, broker)
   // All these costs are depreciated proportionally (building portion only)
-  const totalAcquisitionCost = computed(() =>
-    property.purchasePrice.value + totalPurchaseCosts.value
+  const totalAcquisitionCost = computed(
+    () => property.purchasePrice.value + totalPurchaseCosts.value
   )
 
   const buildingValue = computed(() => {
@@ -173,9 +159,7 @@ export function useCalculations(
     return totalAcquisitionCost.value * (tax.landValuePercent.value / 100)
   })
 
-  const annualDepreciation = computed(() =>
-    buildingValue.value * (depreciationRate.value / 100)
-  )
+  const annualDepreciation = computed(() => buildingValue.value * (depreciationRate.value / 100))
 
   const effectiveMarginalRate = computed(() => {
     if (!tax) return 42
@@ -198,35 +182,31 @@ export function useCalculations(
 
   const annualDeductibleInterest = computed(() => monthlyInterest.value * 12)
 
-  const totalDeductibleExpenses = computed(() =>
-    annualDepreciation.value + annualDeductibleInterest.value + annualExpenses.value
+  const totalDeductibleExpenses = computed(
+    () => annualDepreciation.value + annualDeductibleInterest.value + annualExpenses.value
   )
 
   // Taxable rental income (Einkünfte aus Vermietung und Verpachtung)
   // Negative = loss that offsets other income, Positive = taxable profit
-  const taxableRentalIncome = computed(() =>
-    effectiveAnnualRent.value - totalDeductibleExpenses.value
+  const taxableRentalIncome = computed(
+    () => effectiveAnnualRent.value - totalDeductibleExpenses.value
   )
 
   // Tax impact: negative taxable income = savings, positive = tax due
   // We express this as "savings" so negative value means tax due
-  const annualTaxSavings = computed(() =>
-    -taxableRentalIncome.value * (effectiveMarginalRate.value / 100)
+  const annualTaxSavings = computed(
+    () => -taxableRentalIncome.value * (effectiveMarginalRate.value / 100)
   )
 
   const monthlyTaxSavings = computed(() => annualTaxSavings.value / 12)
 
-  const monthlyCashFlowAfterTax = computed(() =>
-    monthlyCashFlow.value + monthlyTaxSavings.value
-  )
+  const monthlyCashFlowAfterTax = computed(() => monthlyCashFlow.value + monthlyTaxSavings.value)
 
   const annualCashFlowAfterTax = computed(() => monthlyCashFlowAfterTax.value * 12)
 
   // Cash-on-cash return (return on equity invested, after tax)
   const cashOnCashReturn = computed(() =>
-    financing.equity.value > 0
-      ? (annualCashFlowAfterTax.value / financing.equity.value) * 100
-      : 0
+    financing.equity.value > 0 ? (annualCashFlowAfterTax.value / financing.equity.value) * 100 : 0
   )
 
   return {

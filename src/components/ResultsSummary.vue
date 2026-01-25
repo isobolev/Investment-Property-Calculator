@@ -67,7 +67,7 @@ function getCashFlowColor(value: number): string {
 }
 
 function getYieldColor(value: number): string {
-  if (value >= 5) return 'text-green-600'
+  if (value >= 4) return 'text-green-600'
   if (value >= 3) return 'text-yellow-600'
   return 'text-red-600'
 }
@@ -79,8 +79,8 @@ function getRentMultiplierColor(value: number): string {
 }
 
 // Resale calculations
-const resalePrice = computed(() =>
-  props.purchasePrice * Math.pow(1 + props.appreciationRate / 100, props.holdingPeriod)
+const resalePrice = computed(
+  () => props.purchasePrice * Math.pow(1 + props.appreciationRate / 100, props.holdingPeriod)
 )
 
 const appreciation = computed(() => resalePrice.value - props.purchasePrice)
@@ -99,7 +99,7 @@ const remainingBalance = computed(() => {
 
   // Remaining balance = L × (1+r)^n - P × ((1+r)^n - 1) / r
   const factor = Math.pow(1 + monthlyRate, months)
-  const balance = props.loanAmount * factor - props.monthlyMortgage * (factor - 1) / monthlyRate
+  const balance = props.loanAmount * factor - (props.monthlyMortgage * (factor - 1)) / monthlyRate
   return Math.max(0, balance)
 })
 
@@ -107,14 +107,14 @@ const principalPaid = computed(() => props.loanAmount - remainingBalance.value)
 </script>
 
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6">
-    <h2 class="text-xl font-semibold text-gray-800 mb-4">Results Summary (Ergebnisübersicht)</h2>
+  <div class="rounded-lg bg-white p-6 shadow-md">
+    <h2 class="mb-4 text-xl font-semibold text-gray-800">Results Summary (Ergebnisübersicht)</h2>
 
     <div class="space-y-6">
       <!-- Purchase Costs Breakdown -->
       <div>
-        <h3 class="text-lg font-medium text-gray-700 mb-2">Purchase Costs (Kaufnebenkosten)</h3>
-        <div class="bg-gray-50 rounded-md p-4 space-y-2">
+        <h3 class="mb-2 text-lg font-medium text-gray-700">Purchase Costs (Kaufnebenkosten)</h3>
+        <div class="space-y-2 rounded-md bg-gray-50 p-4">
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">Purchase Price (Kaufpreis)</span>
             <span class="font-medium">{{ formatCurrency(purchasePrice) }}</span>
@@ -139,18 +139,25 @@ const principalPaid = computed(() => props.loanAmount - remainingBalance.value)
           <hr class="border-gray-300" />
           <div class="flex justify-between font-medium">
             <span>Total Costs (Summe Nebenkosten)</span>
-            <span>{{ formatCurrency(totalPurchaseCosts) }} ({{ formatPercent(purchaseCostsRate) }})</span>
+            <span
+              >{{ formatCurrency(totalPurchaseCosts) }} ({{
+                formatPercent(purchaseCostsRate)
+              }})</span
+            >
           </div>
-          <div class="flex justify-between font-bold text-lg">
+          <div class="flex justify-between text-lg font-bold">
             <span>Total Investment (Gesamtinvestition)</span>
             <span class="text-blue-600">{{ formatCurrency(totalInvestment) }}</span>
           </div>
         </div>
+      </div>
 
-        <!-- Resale Price -->
-        <div class="bg-emerald-50 rounded-md p-4 mt-3 space-y-2">
+      <!-- Resale Price -->
+      <div>
+        <h3 class="mb-2 text-lg font-medium text-gray-700">Resale Price (Verkaufspreis)</h3>
+        <div class="mt-3 space-y-2 rounded-md bg-emerald-50 p-4">
           <div class="flex justify-between text-sm">
-            <span class="text-gray-600">Property Value after {{ holdingPeriod }} years</span>
+            <span class="text-gray-600">Resale price in {{ holdingPeriod }} years</span>
             <span class="font-medium text-emerald-700">{{ formatCurrency(resalePrice) }}</span>
           </div>
           <div class="flex justify-between text-sm">
@@ -158,11 +165,15 @@ const principalPaid = computed(() => props.loanAmount - remainingBalance.value)
             <span class="text-emerald-600">+{{ formatCurrency(appreciation) }}</span>
           </div>
           <p class="text-xs text-gray-500">
-            {{ holdingPeriod >= 10 ? 'Tax-free sale possible (Spekulationsfrist)' : `${10 - holdingPeriod} more years until tax-free sale` }}
+            {{
+              holdingPeriod >= 10
+                ? 'Tax-free sale possible (Spekulationsfrist)'
+                : `${10 - holdingPeriod} more years until tax-free sale`
+            }}
           </p>
-          <hr class="border-emerald-200 my-2" />
+          <hr class="my-2 border-emerald-200" />
           <div class="flex justify-between text-sm">
-            <span class="text-gray-600">Remaining Loan Balance</span>
+            <span class="text-gray-600">Remaining loan balance at the date of selling</span>
             <span class="font-medium text-red-600">{{ formatCurrency(remainingBalance) }}</span>
           </div>
           <div class="flex justify-between text-sm">
@@ -174,10 +185,10 @@ const principalPaid = computed(() => props.loanAmount - remainingBalance.value)
 
       <!-- Tax Benefits -->
       <div>
-        <h3 class="text-lg font-medium text-gray-700 mb-2">Tax Benefits (Steuerliche Vorteile)</h3>
-        <div class="bg-gray-50 rounded-md p-4 space-y-2">
+        <h3 class="mb-2 text-lg font-medium text-gray-700">Tax Benefits (Steuerliche Vorteile)</h3>
+        <div class="space-y-2 rounded-md bg-gray-50 p-4">
           <!-- Header -->
-          <div class="flex justify-between text-xs text-gray-500 font-medium">
+          <div class="flex justify-between text-xs font-medium text-gray-500">
             <span></span>
             <div class="flex gap-4">
               <span class="w-20 text-right">Monthly</span>
@@ -187,44 +198,81 @@ const principalPaid = computed(() => props.loanAmount - remainingBalance.value)
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">+ Rental Income (Mieteinnahmen)</span>
             <div class="flex gap-4">
-              <span class="w-20 text-right text-blue-600">{{ formatCurrency(effectiveAnnualRent / 12) }}</span>
-              <span class="w-20 text-right text-blue-600">{{ formatCurrency(effectiveAnnualRent) }}</span>
+              <span class="w-20 text-right text-blue-600">{{
+                formatCurrency(effectiveAnnualRent / 12)
+              }}</span>
+              <span class="w-20 text-right text-blue-600">{{
+                formatCurrency(effectiveAnnualRent)
+              }}</span>
             </div>
           </div>
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">- Depreciation (AfA)</span>
             <div class="flex gap-4">
-              <span class="w-20 text-right text-green-600">-{{ formatCurrency(annualDepreciation / 12) }}</span>
-              <span class="w-20 text-right text-green-600">-{{ formatCurrency(annualDepreciation) }}</span>
+              <span class="w-20 text-right text-green-600"
+                >-{{ formatCurrency(annualDepreciation / 12) }}</span
+              >
+              <span class="w-20 text-right text-green-600"
+                >-{{ formatCurrency(annualDepreciation) }}</span
+              >
             </div>
           </div>
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">- Deductible Interest (Schuldzinsen)</span>
             <div class="flex gap-4">
-              <span class="w-20 text-right text-green-600">-{{ formatCurrency(annualDeductibleInterest / 12) }}</span>
-              <span class="w-20 text-right text-green-600">-{{ formatCurrency(annualDeductibleInterest) }}</span>
+              <span class="w-20 text-right text-green-600"
+                >-{{ formatCurrency(annualDeductibleInterest / 12) }}</span
+              >
+              <span class="w-20 text-right text-green-600"
+                >-{{ formatCurrency(annualDeductibleInterest) }}</span
+              >
             </div>
           </div>
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">- Operating Costs (Bewirtschaftungskosten)</span>
             <div class="flex gap-4">
-              <span class="w-20 text-right text-green-600">-{{ formatCurrency(annualExpenses / 12) }}</span>
-              <span class="w-20 text-right text-green-600">-{{ formatCurrency(annualExpenses) }}</span>
+              <span class="w-20 text-right text-green-600"
+                >-{{ formatCurrency(annualExpenses / 12) }}</span
+              >
+              <span class="w-20 text-right text-green-600"
+                >-{{ formatCurrency(annualExpenses) }}</span
+              >
             </div>
           </div>
           <hr class="border-gray-300" />
           <div class="flex justify-between font-medium">
             <span>= Taxable Rental Income (Einkünfte V+V)</span>
             <div class="flex gap-4">
-              <span class="w-20 text-right" :class="taxableRentalIncome < 0 ? 'text-green-600' : 'text-red-600'">{{ formatCurrency(taxableRentalIncome / 12) }}</span>
-              <span class="w-20 text-right" :class="taxableRentalIncome < 0 ? 'text-green-600' : 'text-red-600'">{{ formatCurrency(taxableRentalIncome) }}</span>
+              <span
+                class="w-20 text-right"
+                :class="taxableRentalIncome < 0 ? 'text-green-600' : 'text-red-600'"
+                >{{ formatCurrency(taxableRentalIncome / 12) }}</span
+              >
+              <span
+                class="w-20 text-right"
+                :class="taxableRentalIncome < 0 ? 'text-green-600' : 'text-red-600'"
+                >{{ formatCurrency(taxableRentalIncome) }}</span
+              >
             </div>
           </div>
-          <div class="flex justify-between font-bold text-lg -mx-4 px-4 py-2 rounded" :class="annualTaxSavings >= 0 ? 'bg-green-100' : 'bg-red-100'">
-            <span>{{ annualTaxSavings >= 0 ? 'Tax Savings (Steuerersparnis)' : 'Tax Due (Steuerlast)' }}</span>
+          <div
+            class="-mx-4 flex justify-between rounded px-4 py-2 text-lg font-bold"
+            :class="annualTaxSavings >= 0 ? 'bg-green-100' : 'bg-red-100'"
+          >
+            <span>{{
+              annualTaxSavings >= 0 ? 'Tax Savings (Steuerersparnis)' : 'Tax Due (Steuerlast)'
+            }}</span>
             <div class="flex gap-4">
-              <span class="w-20 text-right" :class="annualTaxSavings >= 0 ? 'text-green-600' : 'text-red-600'">{{ formatCurrency(Math.abs(annualTaxSavings / 12)) }}</span>
-              <span class="w-20 text-right" :class="annualTaxSavings >= 0 ? 'text-green-600' : 'text-red-600'">{{ formatCurrency(Math.abs(annualTaxSavings)) }}</span>
+              <span
+                class="w-20 text-right"
+                :class="annualTaxSavings >= 0 ? 'text-green-600' : 'text-red-600'"
+                >{{ formatCurrency(Math.abs(annualTaxSavings / 12)) }}</span
+              >
+              <span
+                class="w-20 text-right"
+                :class="annualTaxSavings >= 0 ? 'text-green-600' : 'text-red-600'"
+                >{{ formatCurrency(Math.abs(annualTaxSavings)) }}</span
+              >
             </div>
           </div>
         </div>
@@ -232,8 +280,10 @@ const principalPaid = computed(() => props.loanAmount - remainingBalance.value)
 
       <!-- Cash Flow -->
       <div>
-        <h3 class="text-lg font-medium text-gray-700 mb-2">Monthly Cash Flow (Monatlicher Cashflow)</h3>
-        <div class="bg-gray-50 rounded-md p-4 space-y-2">
+        <h3 class="mb-2 text-lg font-medium text-gray-700">
+          Monthly Cash Flow (Monatlicher Cashflow)
+        </h3>
+        <div class="space-y-2 rounded-md bg-gray-50 p-4">
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">+ Rental Income (effective)</span>
             <span class="text-green-600">{{ formatCurrency(effectiveMonthlyRent) }}</span>
@@ -247,7 +297,7 @@ const principalPaid = computed(() => props.loanAmount - remainingBalance.value)
             <span class="text-red-600">-{{ formatCurrency(monthlyMortgage) }}</span>
           </div>
           <hr class="border-gray-300" />
-          <div class="flex justify-between font-bold text-lg">
+          <div class="flex justify-between text-lg font-bold">
             <span>= Cashflow</span>
             <span :class="getCashFlowColor(monthlyCashFlow)">
               {{ formatCurrency(monthlyCashFlow) }}
@@ -261,12 +311,15 @@ const principalPaid = computed(() => props.loanAmount - remainingBalance.value)
           </div>
           <hr class="border-gray-200" />
           <div class="flex justify-between text-sm">
-            <span class="text-gray-600">{{ annualTaxSavings >= 0 ? '+ Tax Savings' : '- Tax Due' }}</span>
+            <span class="text-gray-600">{{
+              annualTaxSavings >= 0 ? '+ Tax Savings' : '- Tax Due'
+            }}</span>
             <span :class="annualTaxSavings >= 0 ? 'text-green-600' : 'text-red-600'">
-              {{ annualTaxSavings >= 0 ? '+' : '-' }}{{ formatCurrency(Math.abs(annualTaxSavings / 12)) }}
+              {{ annualTaxSavings >= 0 ? '+' : '-'
+              }}{{ formatCurrency(Math.abs(annualTaxSavings / 12)) }}
             </span>
           </div>
-          <div class="flex justify-between font-bold text-lg bg-green-50 -mx-4 px-4 py-2 rounded">
+          <div class="-mx-4 flex justify-between rounded bg-green-50 px-4 py-2 text-lg font-bold">
             <span>= Cashflow (after tax)</span>
             <span :class="getCashFlowColor(monthlyCashFlowAfterTax)">
               {{ formatCurrency(monthlyCashFlowAfterTax) }}
@@ -283,63 +336,76 @@ const principalPaid = computed(() => props.loanAmount - remainingBalance.value)
 
       <!-- Key Metrics -->
       <div>
-        <h3 class="text-lg font-medium text-gray-700 mb-2">Key Metrics (Kennzahlen)</h3>
+        <h3 class="mb-2 text-lg font-medium text-gray-700">Key Metrics (Kennzahlen)</h3>
         <div class="grid grid-cols-2 gap-3">
           <!-- Gross Yield -->
-          <div class="bg-blue-50 rounded-md p-3 text-center relative group cursor-help">
-            <p class="text-xs text-blue-600 mb-1">Gross Yield (Bruttorendite)</p>
+          <div class="group relative cursor-help rounded-md bg-blue-50 p-3 text-center">
+            <p class="mb-1 text-xs text-blue-600">Gross Yield (Bruttorendite)</p>
             <p class="text-xl font-bold" :class="getYieldColor(grossYield)">
               {{ formatPercent(grossYield) }}
             </p>
             <p class="text-xs text-gray-500">Annual Rent / Purchase Price</p>
-            <div class="absolute hidden group-hover:block bg-gray-800 text-white text-xs p-2 rounded shadow-lg z-10 w-48 -top-2 left-1/2 -translate-x-1/2 -translate-y-full">
-              Annual rent divided by purchase price. Does not account for purchase costs or expenses.
+            <div
+              class="absolute -top-2 left-1/2 z-10 hidden w-48 -translate-x-1/2 -translate-y-full rounded bg-gray-800 p-2 text-xs text-white shadow-lg group-hover:block"
+            >
+              Annual rent divided by purchase price. Does not account for purchase costs or
+              expenses.
             </div>
           </div>
 
           <!-- Net Yield -->
-          <div class="bg-blue-50 rounded-md p-3 text-center relative group cursor-help">
-            <p class="text-xs text-blue-600 mb-1">Net Yield (Nettorendite)</p>
+          <div class="group relative cursor-help rounded-md bg-blue-50 p-3 text-center">
+            <p class="mb-1 text-xs text-blue-600">Net Yield (Nettorendite)</p>
             <p class="text-xl font-bold" :class="getYieldColor(netYield)">
               {{ formatPercent(netYield) }}
             </p>
             <p class="text-xs text-gray-500">NOI / Total Investment</p>
-            <div class="absolute hidden group-hover:block bg-gray-800 text-white text-xs p-2 rounded shadow-lg z-10 w-48 -top-2 left-1/2 -translate-x-1/2 -translate-y-full">
+            <div
+              class="absolute -top-2 left-1/2 z-10 hidden w-48 -translate-x-1/2 -translate-y-full rounded bg-gray-800 p-2 text-xs text-white shadow-lg group-hover:block"
+            >
               Net operating income divided by total investment including purchase costs.
             </div>
           </div>
 
           <!-- Cash on Cash -->
-          <div class="bg-purple-50 rounded-md p-3 text-center relative group cursor-help">
-            <p class="text-xs text-purple-600 mb-1">Cash-on-Cash Return (Eigenkapitalrendite)</p>
+          <div class="group relative cursor-help rounded-md bg-purple-50 p-3 text-center">
+            <p class="mb-1 text-xs text-purple-600">Cash-on-Cash Return (Eigenkapitalrendite)</p>
             <p class="text-xl font-bold" :class="getCashFlowColor(cashOnCashReturn)">
               {{ formatPercent(cashOnCashReturn) }}
             </p>
             <p class="text-xs text-gray-500">Cash Flow (after tax) / Equity</p>
-            <div class="absolute hidden group-hover:block bg-gray-800 text-white text-xs p-2 rounded shadow-lg z-10 w-48 -top-2 left-1/2 -translate-x-1/2 -translate-y-full">
-              Annual cash flow including tax benefits divided by equity invested. Shows actual return on your cash.
+            <div
+              class="absolute -top-2 left-1/2 z-10 hidden w-48 -translate-x-1/2 -translate-y-full rounded bg-gray-800 p-2 text-xs text-white shadow-lg group-hover:block"
+            >
+              Annual cash flow including tax benefits divided by equity invested. Shows actual
+              return on your cash.
             </div>
           </div>
 
           <!-- Rent Multiplier -->
-          <div class="bg-amber-50 rounded-md p-3 text-center relative group cursor-help">
-            <p class="text-xs text-amber-600 mb-1">Rent Multiplier (Kaufpreisfaktor)</p>
+          <div class="group relative cursor-help rounded-md bg-amber-50 p-3 text-center">
+            <p class="mb-1 text-xs text-amber-600">Rent Multiplier (Kaufpreisfaktor)</p>
             <p class="text-xl font-bold" :class="getRentMultiplierColor(rentMultiplier)">
               {{ rentMultiplier.toFixed(1) }}x
             </p>
             <p class="text-xs text-gray-500">Purchase Price / Annual Rent</p>
-            <div class="absolute hidden group-hover:block bg-gray-800 text-white text-xs p-2 rounded shadow-lg z-10 w-48 -top-2 left-1/2 -translate-x-1/2 -translate-y-full">
-              Purchase price divided by annual rent. Lower is better. Under 20 is good, under 25 is acceptable.
+            <div
+              class="absolute -top-2 left-1/2 z-10 hidden w-48 -translate-x-1/2 -translate-y-full rounded bg-gray-800 p-2 text-xs text-white shadow-lg group-hover:block"
+            >
+              Purchase price divided by annual rent. Lower is better. Under 20 is good, under 25 is
+              acceptable.
             </div>
           </div>
         </div>
       </div>
 
       <!-- Legend -->
-      <div class="text-xs text-gray-500 space-y-1">
-        <p><span class="text-green-600 font-medium">Green</span>: Good values |
-           <span class="text-yellow-600 font-medium">Yellow</span>: Acceptable |
-           <span class="text-red-600 font-medium">Red</span>: Critical</p>
+      <div class="space-y-1 text-xs text-gray-500">
+        <p>
+          <span class="font-medium text-green-600">Green</span>: Good values |
+          <span class="font-medium text-yellow-600">Yellow</span>: Acceptable |
+          <span class="font-medium text-red-600">Red</span>: Critical
+        </p>
         <p>Gross Yield: &gt;5% good | Rent Multiplier: &lt;20 good, &lt;25 acceptable</p>
       </div>
     </div>

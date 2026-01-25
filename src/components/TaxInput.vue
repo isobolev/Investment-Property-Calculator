@@ -59,15 +59,15 @@ function formatPercent(value: number): string {
 </script>
 
 <template>
-  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+  <div class="overflow-hidden rounded-lg bg-white shadow-md">
     <!-- Header -->
     <button
       @click="isExpanded = !isExpanded"
-      class="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+      class="flex w-full items-center justify-between p-4 transition-colors hover:bg-gray-50"
     >
       <h2 class="text-lg font-semibold text-gray-800">Tax Deductions (Steuerliche Abschreibung)</h2>
       <svg
-        :class="['w-5 h-5 text-gray-500 transition-transform', isExpanded ? 'rotate-180' : '']"
+        :class="['h-5 w-5 text-gray-500 transition-transform', isExpanded ? 'rotate-180' : '']"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -77,44 +77,58 @@ function formatPercent(value: number): string {
     </button>
 
     <!-- Summary (visible when collapsed) -->
-    <div v-if="!isExpanded" class="px-4 pb-4 -mt-2">
+    <div v-if="!isExpanded" class="-mt-2 px-4 pb-4">
       <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-        <span class="text-gray-600">AfA: <span class="font-medium text-gray-900">{{ depreciationRate }}%</span></span>
-        <span class="text-gray-600">Tax Rate: <span class="font-medium text-blue-600">{{ formatPercent(effectiveMarginalRate) }}</span></span>
-        <span class="text-gray-600">Depreciation: <span class="font-medium text-green-600">{{ formatCurrency(annualDepreciation) }}/yr</span></span>
+        <span class="text-gray-600"
+          >AfA: <span class="font-medium text-gray-900">{{ depreciationRate }}%</span></span
+        >
+        <span class="text-gray-600"
+          >Tax Rate:
+          <span class="font-medium text-blue-600">{{
+            formatPercent(effectiveMarginalRate)
+          }}</span></span
+        >
+        <span class="text-gray-600"
+          >Depreciation:
+          <span class="font-medium text-green-600"
+            >{{ formatCurrency(annualDepreciation) }}/yr</span
+          ></span
+        >
       </div>
     </div>
 
     <!-- Expanded Content -->
-    <div v-if="isExpanded" class="px-6 pb-6 space-y-4">
+    <div v-if="isExpanded" class="space-y-4 px-6 pb-6">
       <!-- Depreciation Rate -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+        <label class="mb-1 block text-sm font-medium text-gray-700">
           Depreciation Rate (AfA-Satz): {{ depreciationRate }}%
         </label>
         <input
           type="range"
           :value="depreciationRate"
-          @input="emit('update:depreciationRate', Number(($event.target as HTMLInputElement).value))"
+          @input="
+            emit('update:depreciationRate', Number(($event.target as HTMLInputElement).value))
+          "
           min="0.5"
           max="10"
           step="0.5"
-          class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+          class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
         />
-        <div class="flex justify-between text-xs text-gray-500 mt-1">
+        <div class="mt-1 flex justify-between text-xs text-gray-500">
           <span>0.5%</span>
           <span>10%</span>
         </div>
-        <div class="flex flex-wrap gap-2 mt-2">
+        <div class="mt-2 flex flex-wrap gap-2">
           <button
             v-for="preset in depreciationPresets"
             :key="preset.rate"
             type="button"
             :class="[
-              'px-3 py-1 text-xs rounded-full border',
+              'rounded-full border px-3 py-1 text-xs',
               depreciationRate === preset.rate
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                ? 'border-blue-600 bg-blue-600 text-white'
+                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
             ]"
             @click="emit('update:depreciationRate', preset.rate)"
           >
@@ -125,23 +139,25 @@ function formatPercent(value: number): string {
 
       <!-- Land Value Percentage -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+        <label class="mb-1 block text-sm font-medium text-gray-700">
           Land Value (Grundstückswert): {{ landValuePercent }}%
         </label>
         <input
           type="range"
           :value="landValuePercent"
-          @input="emit('update:landValuePercent', Number(($event.target as HTMLInputElement).value))"
+          @input="
+            emit('update:landValuePercent', Number(($event.target as HTMLInputElement).value))
+          "
           min="10"
           max="50"
           step="1"
-          class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+          class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
         />
-        <div class="flex justify-between text-xs text-gray-500 mt-1">
+        <div class="mt-1 flex justify-between text-xs text-gray-500">
           <span>10%</span>
           <span>50%</span>
         </div>
-        <div class="mt-2 p-2 bg-gray-50 rounded text-sm">
+        <div class="mt-2 rounded bg-gray-50 p-2 text-sm">
           <div class="flex justify-between">
             <span class="text-gray-600">Building Value (Gebäudewert)</span>
             <span class="font-medium">{{ formatCurrency(buildingValue) }}</span>
@@ -150,7 +166,7 @@ function formatPercent(value: number): string {
             <span class="text-gray-600">Land Value (Grundstückswert)</span>
             <span class="font-medium">{{ formatCurrency(landValue) }}</span>
           </div>
-          <div class="flex justify-between text-green-600 font-medium mt-1">
+          <div class="mt-1 flex justify-between font-medium text-green-600">
             <span>Annual Depreciation (Jährliche AfA)</span>
             <span>{{ formatCurrency(annualDepreciation) }}</span>
           </div>
@@ -159,17 +175,15 @@ function formatPercent(value: number): string {
 
       <!-- Tax Input Mode Toggle -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">
-          Tax Rate Input Method
-        </label>
+        <label class="mb-2 block text-sm font-medium text-gray-700"> Tax Rate Input Method </label>
         <div class="flex rounded-md shadow-sm">
           <button
             type="button"
             :class="[
-              'flex-1 px-4 py-2 text-sm font-medium border',
+              'flex-1 border px-4 py-2 text-sm font-medium',
               taxInputMode === 'rate'
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                ? 'border-blue-600 bg-blue-600 text-white'
+                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
             ]"
             @click="emit('update:taxInputMode', 'rate')"
           >
@@ -178,10 +192,10 @@ function formatPercent(value: number): string {
           <button
             type="button"
             :class="[
-              'flex-1 px-4 py-2 text-sm font-medium border-t border-b border-r',
+              'flex-1 border-b border-r border-t px-4 py-2 text-sm font-medium',
               taxInputMode === 'income'
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                ? 'border-blue-600 bg-blue-600 text-white'
+                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
             ]"
             @click="emit('update:taxInputMode', 'income')"
           >
@@ -192,7 +206,7 @@ function formatPercent(value: number): string {
 
       <!-- Direct Rate Input -->
       <div v-if="taxInputMode === 'rate'">
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+        <label class="mb-1 block text-sm font-medium text-gray-700">
           Marginal Tax Rate (Grenzsteuersatz): {{ marginalTaxRate }}%
         </label>
         <input
@@ -202,18 +216,18 @@ function formatPercent(value: number): string {
           min="0"
           max="45"
           step="1"
-          class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+          class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
         />
-        <div class="flex flex-wrap gap-2 mt-2">
+        <div class="mt-2 flex flex-wrap gap-2">
           <button
             v-for="preset in marginalRatePresets"
             :key="preset.rate"
             type="button"
             :class="[
-              'px-3 py-1 text-xs rounded-full border',
+              'rounded-full border px-3 py-1 text-xs',
               marginalTaxRate === preset.rate
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                ? 'border-blue-600 bg-blue-600 text-white'
+                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
             ]"
             @click="emit('update:marginalTaxRate', preset.rate)"
           >
@@ -224,7 +238,7 @@ function formatPercent(value: number): string {
 
       <!-- Income-based Rate Input -->
       <div v-else>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+        <label class="mb-1 block text-sm font-medium text-gray-700">
           Taxable Income (Zu versteuerndes Einkommen)
         </label>
         <input
@@ -233,23 +247,32 @@ function formatPercent(value: number): string {
           @input="emit('update:taxableIncome', Number(($event.target as HTMLInputElement).value))"
           min="0"
           step="1000"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <p class="mt-1 text-sm text-gray-600">
-          Calculated marginal rate: <span class="font-medium text-blue-600">{{ formatPercent(calculatedMarginalRate) }}</span>
-          <span v-if="jointTaxDeclaration" class="text-gray-500"> (based on {{ formatCurrency(taxableIncome / 2) }} each)</span>
+          Calculated marginal rate:
+          <span class="font-medium text-blue-600">{{ formatPercent(calculatedMarginalRate) }}</span>
+          <span v-if="jointTaxDeclaration" class="text-gray-500">
+            (based on {{ formatCurrency(taxableIncome / 2) }} each)</span
+          >
         </p>
 
         <!-- Joint Tax Declaration Checkbox -->
-        <div class="flex items-center mt-3">
+        <div class="mt-3 flex items-center">
           <input
             type="checkbox"
             id="jointTaxDeclaration"
             :checked="jointTaxDeclaration"
-            @change="emit('update:jointTaxDeclaration', ($event.target as HTMLInputElement).checked)"
-            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            @change="
+              emit('update:jointTaxDeclaration', ($event.target as HTMLInputElement).checked)
+            "
+            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
-          <label for="jointTaxDeclaration" class="ml-2 block text-sm text-gray-700" title="For married couples filing jointly - income is split for tax calculation">
+          <label
+            for="jointTaxDeclaration"
+            class="ml-2 block text-sm text-gray-700"
+            title="For married couples filing jointly - income is split for tax calculation"
+          >
             Joint tax declaration (Zusammenveranlagung)
           </label>
         </div>
@@ -262,7 +285,7 @@ function formatPercent(value: number): string {
           id="includeSoli"
           :checked="includeSoli"
           @change="emit('update:includeSoli', ($event.target as HTMLInputElement).checked)"
-          class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
         />
         <label for="includeSoli" class="ml-2 block text-sm text-gray-700">
           Include Solidaritätszuschlag (+5.5%)
@@ -270,12 +293,14 @@ function formatPercent(value: number): string {
       </div>
 
       <!-- Effective Rate Display -->
-      <div class="p-3 bg-blue-50 rounded-md">
-        <div class="flex justify-between items-center">
+      <div class="rounded-md bg-blue-50 p-3">
+        <div class="flex items-center justify-between">
           <span class="text-sm font-medium text-blue-700">Effective Marginal Rate</span>
-          <span class="text-lg font-bold text-blue-600">{{ formatPercent(effectiveMarginalRate) }}</span>
+          <span class="text-lg font-bold text-blue-600">{{
+            formatPercent(effectiveMarginalRate)
+          }}</span>
         </div>
-        <p class="text-xs text-blue-600 mt-1">
+        <p class="mt-1 text-xs text-blue-600">
           {{ includeSoli ? 'Including Solidaritätszuschlag' : 'Without Solidaritätszuschlag' }}
         </p>
       </div>

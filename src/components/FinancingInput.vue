@@ -24,22 +24,24 @@ function formatCurrency(value: number): string {
 }
 
 const equityPercent = computed(() =>
-  props.totalInvestment > 0
-    ? (equity.value / props.totalInvestment * 100).toFixed(1)
-    : '0'
+  props.totalInvestment > 0 ? ((equity.value / props.totalInvestment) * 100).toFixed(1) : '0'
 )
+
+const monthlyInterest = computed(() => (props.loanAmount * (interestRate.value / 100)) / 12)
+
+const monthlyRepayment = computed(() => (props.loanAmount * (repaymentRate.value / 100)) / 12)
 </script>
 
 <template>
-  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+  <div class="overflow-hidden rounded-lg bg-white shadow-md">
     <!-- Header -->
     <button
       @click="isExpanded = !isExpanded"
-      class="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+      class="flex w-full items-center justify-between p-4 transition-colors hover:bg-gray-50"
     >
       <h2 class="text-lg font-semibold text-gray-800">Financing (Finanzierung)</h2>
       <svg
-        :class="['w-5 h-5 text-gray-500 transition-transform', isExpanded ? 'rotate-180' : '']"
+        :class="['h-5 w-5 text-gray-500 transition-transform', isExpanded ? 'rotate-180' : '']"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -49,34 +51,44 @@ const equityPercent = computed(() =>
     </button>
 
     <!-- Summary (visible when collapsed) -->
-    <div v-if="!isExpanded" class="px-4 pb-4 -mt-2">
+    <div v-if="!isExpanded" class="-mt-2 px-4 pb-4">
       <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-        <span class="text-gray-600">Equity: <span class="font-medium text-gray-900">{{ formatCurrency(equity) }}</span></span>
-        <span class="text-gray-600">Loan: <span class="font-medium text-gray-900">{{ formatCurrency(loanAmount) }}</span></span>
-        <span class="text-gray-600">Rate: <span class="font-medium text-amber-600">{{ formatCurrency(monthlyMortgage) }}/mo</span></span>
+        <span class="text-gray-600"
+          >Equity: <span class="font-medium text-gray-900">{{ formatCurrency(equity) }}</span></span
+        >
+        <span class="text-gray-600"
+          >Loan:
+          <span class="font-medium text-gray-900">{{ formatCurrency(loanAmount) }}</span></span
+        >
+        <span class="text-gray-600"
+          >Rate:
+          <span class="font-medium text-amber-600"
+            >{{ formatCurrency(monthlyMortgage) }}/mo</span
+          ></span
+        >
       </div>
     </div>
 
     <!-- Expanded Content -->
-    <div v-if="isExpanded" class="px-6 pb-6 space-y-4">
+    <div v-if="isExpanded" class="space-y-4 px-6 pb-6">
       <!-- Total Investment Info -->
-      <div class="bg-gray-50 rounded-md p-3">
-        <p class="text-sm text-gray-600">Total Investment (Gesamtinvestition) - Purchase Price + Costs</p>
+      <div class="rounded-md bg-gray-50 p-3">
+        <p class="text-sm text-gray-600">
+          Total Investment (Gesamtinvestition) - Purchase Price + Costs
+        </p>
         <p class="text-lg font-semibold text-gray-800">{{ formatCurrency(totalInvestment) }}</p>
       </div>
 
       <!-- Equity -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Equity (Eigenkapital)
-        </label>
+        <label class="mb-1 block text-sm font-medium text-gray-700"> Equity (Eigenkapital) </label>
         <div class="relative">
           <input
             v-model.number="equity"
             type="number"
             min="0"
             step="5000"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
             placeholder="60000"
           />
           <span class="absolute right-3 top-2 text-gray-500"></span>
@@ -85,15 +97,17 @@ const equityPercent = computed(() =>
       </div>
 
       <!-- Loan Amount (Calculated) -->
-      <div class="bg-blue-50 rounded-md p-3">
+      <div class="rounded-md bg-blue-50 p-3">
         <p class="text-sm text-blue-600">Loan Amount (Darlehensbetrag)</p>
         <p class="text-lg font-semibold text-blue-800">{{ formatCurrency(loanAmount) }}</p>
-        <p class="text-xs text-blue-600">Loan-to-Value (Beleihungsauslauf): {{ loanToValue.toFixed(1) }}%</p>
+        <p class="text-xs text-blue-600">
+          Loan-to-Value (Beleihungsauslauf): {{ loanToValue.toFixed(1) }}%
+        </p>
       </div>
 
       <!-- Interest Rate -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+        <label class="mb-1 block text-sm font-medium text-gray-700">
           Interest Rate (Sollzins)
         </label>
         <div class="flex items-center gap-4">
@@ -103,16 +117,16 @@ const equityPercent = computed(() =>
             min="0.5"
             max="8"
             step="0.1"
-            class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            class="h-2 flex-1 cursor-pointer appearance-none rounded-lg bg-gray-200"
           />
-          <div class="flex items-center gap-1 w-24">
+          <div class="flex w-24 items-center gap-1">
             <input
               v-model.number="interestRate"
               type="number"
               min="0.5"
               max="10"
               step="0.1"
-              class="w-16 px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
             />
             <span class="text-gray-600">%</span>
           </div>
@@ -121,7 +135,7 @@ const equityPercent = computed(() =>
 
       <!-- Repayment Rate (Tilgung) -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+        <label class="mb-1 block text-sm font-medium text-gray-700">
           Initial Repayment (Anfängliche Tilgung)
         </label>
         <div class="flex items-center gap-4">
@@ -131,16 +145,16 @@ const equityPercent = computed(() =>
             min="0.5"
             max="5"
             step="0.1"
-            class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            class="h-2 flex-1 cursor-pointer appearance-none rounded-lg bg-gray-200"
           />
-          <div class="flex items-center gap-1 w-24">
+          <div class="flex w-24 items-center gap-1">
             <input
               v-model.number="repaymentRate"
               type="number"
               min="0.5"
               max="10"
               step="0.1"
-              class="w-16 px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
             />
             <span class="text-gray-600">%</span>
           </div>
@@ -151,10 +165,19 @@ const equityPercent = computed(() =>
       </div>
 
       <!-- Monthly Payment -->
-      <div class="bg-amber-50 rounded-md p-3 border border-amber-200">
+      <div class="rounded-md border border-amber-200 bg-amber-50 p-3">
         <p class="text-sm text-amber-700">Monthly Payment (Monatliche Rate)</p>
         <p class="text-2xl font-bold text-amber-800">{{ formatCurrency(monthlyMortgage) }}</p>
-        <p class="text-xs text-amber-600">per month</p>
+        <div class="mt-2 flex gap-4 text-xs">
+          <span class="text-amber-700"
+            >Interest (Zinsen):
+            <span class="font-medium">{{ formatCurrency(monthlyInterest) }}</span></span
+          >
+          <span class="text-amber-700"
+            >Repayment (Tilgung):
+            <span class="font-medium">{{ formatCurrency(monthlyRepayment) }}</span></span
+          >
+        </div>
       </div>
     </div>
   </div>

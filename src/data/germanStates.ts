@@ -24,5 +24,5 @@ export const germanStates: GermanState[] = [
 ]
 
 export function getStateByCode(code: string): GermanState | undefined {
-  return germanStates.find(state => state.code === code)
+  return germanStates.find((state) => state.code === code)
 }

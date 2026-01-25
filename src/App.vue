@@ -78,15 +78,19 @@ const calculations = useCalculations(
 
 <template>
   <div class="min-h-screen bg-gray-100 py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <!-- Header -->
-      <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Investment Property Calculator (Immobilien Renditerechner)</h1>
-        <p class="mt-2 text-gray-600">Calculate purchase costs, financing, and returns for your investment property</p>
+      <div class="mb-8 text-center">
+        <h1 class="text-3xl font-bold text-gray-900">
+          Investment Property Calculator (Immobilien Renditerechner)
+        </h1>
+        <p class="mt-2 text-gray-600">
+          Calculate purchase costs, financing, and returns for your investment property
+        </p>
       </div>
 
       <!-- Main Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <!-- Left Column: Inputs -->
         <div class="space-y-6">
           <PropertyInput
@@ -180,7 +184,10 @@ const calculations = useCalculations(
 
       <!-- Footer -->
       <div class="mt-8 text-center text-sm text-gray-500">
-        <p>This calculation is for informational purposes only and does not replace professional advice.</p>
+        <p>
+          This calculation is for informational purposes only and does not replace professional
+          advice.
+        </p>
         <p class="mt-1">All information without guarantee.</p>
       </div>
     </div>

@@ -9,15 +9,15 @@ const isExpanded = ref(false)
 </script>
 
 <template>
-  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+  <div class="overflow-hidden rounded-lg bg-white shadow-md">
     <!-- Header -->
     <button
       @click="isExpanded = !isExpanded"
-      class="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+      class="flex w-full items-center justify-between p-4 transition-colors hover:bg-gray-50"
     >
       <h2 class="text-lg font-semibold text-gray-800">Assumptions (Annahmen)</h2>
       <svg
-        :class="['w-5 h-5 text-gray-500 transition-transform', isExpanded ? 'rotate-180' : '']"
+        :class="['h-5 w-5 text-gray-500 transition-transform', isExpanded ? 'rotate-180' : '']"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -27,19 +27,26 @@ const isExpanded = ref(false)
     </button>
 
     <!-- Summary (visible when collapsed) -->
-    <div v-if="!isExpanded" class="px-4 pb-4 -mt-2">
+    <div v-if="!isExpanded" class="-mt-2 px-4 pb-4">
       <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-        <span class="text-gray-600">Appreciation: <span class="font-medium text-gray-900">{{ appreciationRate }}%</span></span>
-        <span class="text-gray-600">Inflation: <span class="font-medium text-gray-900">{{ inflationRate }}%</span></span>
-        <span class="text-gray-600">Holding: <span class="font-medium text-gray-900">{{ holdingPeriod }} yrs</span></span>
+        <span class="text-gray-600"
+          >Appreciation:
+          <span class="font-medium text-gray-900">{{ appreciationRate }}%</span></span
+        >
+        <span class="text-gray-600"
+          >Inflation: <span class="font-medium text-gray-900">{{ inflationRate }}%</span></span
+        >
+        <span class="text-gray-600"
+          >Holding: <span class="font-medium text-gray-900">{{ holdingPeriod }} yrs</span></span
+        >
       </div>
     </div>
 
     <!-- Expanded Content -->
-    <div v-if="isExpanded" class="px-6 pb-6 space-y-4">
+    <div v-if="isExpanded" class="space-y-4 px-6 pb-6">
       <!-- Property Appreciation Rate -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+        <label class="mb-1 block text-sm font-medium text-gray-700">
           Property Appreciation (Wertsteigerung)
         </label>
         <div class="flex items-center gap-4">
@@ -49,16 +56,16 @@ const isExpanded = ref(false)
             min="0"
             max="10"
             step="0.5"
-            class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            class="h-2 flex-1 cursor-pointer appearance-none rounded-lg bg-gray-200"
           />
-          <div class="flex items-center gap-1 w-24">
+          <div class="flex w-24 items-center gap-1">
             <input
               v-model.number="appreciationRate"
               type="number"
               min="0"
               max="20"
               step="0.5"
-              class="w-16 px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
             />
             <span class="text-gray-600">%</span>
           </div>
@@ -68,7 +75,7 @@ const isExpanded = ref(false)
 
       <!-- Inflation Rate -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+        <label class="mb-1 block text-sm font-medium text-gray-700">
           Inflation Rate (Inflationsrate)
         </label>
         <div class="flex items-center gap-4">
@@ -78,16 +85,16 @@ const isExpanded = ref(false)
             min="0"
             max="10"
             step="0.5"
-            class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            class="h-2 flex-1 cursor-pointer appearance-none rounded-lg bg-gray-200"
           />
-          <div class="flex items-center gap-1 w-24">
+          <div class="flex w-24 items-center gap-1">
             <input
               v-model.number="inflationRate"
               type="number"
               min="0"
               max="20"
               step="0.5"
-              class="w-16 px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
             />
             <span class="text-gray-600">%</span>
           </div>
@@ -97,7 +104,7 @@ const isExpanded = ref(false)
 
       <!-- Holding Period -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+        <label class="mb-1 block text-sm font-medium text-gray-700">
           Holding Period (Haltedauer)
         </label>
         <div class="flex items-center gap-4">
@@ -107,16 +114,16 @@ const isExpanded = ref(false)
             min="1"
             max="30"
             step="1"
-            class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            class="h-2 flex-1 cursor-pointer appearance-none rounded-lg bg-gray-200"
           />
-          <div class="flex items-center gap-1 w-24">
+          <div class="flex w-24 items-center gap-1">
             <input
               v-model.number="holdingPeriod"
               type="number"
               min="1"
               max="50"
               step="1"
-              class="w-16 px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
             />
             <span class="text-gray-600">yrs</span>
           </div>
@@ -125,9 +132,12 @@ const isExpanded = ref(false)
       </div>
 
       <!-- Info Box -->
-      <div class="bg-gray-50 rounded-md p-3 text-sm text-gray-600">
-        <p class="font-medium text-gray-700 mb-1">Note</p>
-        <p>These assumptions are used for long-term projections. After 10 years of ownership, capital gains are tax-free in Germany (Spekulationsfrist).</p>
+      <div class="rounded-md bg-gray-50 p-3 text-sm text-gray-600">
+        <p class="mb-1 font-medium text-gray-700">Note</p>
+        <p>
+          These assumptions are used for long-term projections. After 10 years of ownership, capital
+          gains are tax-free in Germany (Spekulationsfrist).
+        </p>
       </div>
     </div>
   </div>
