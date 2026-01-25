@@ -30,6 +30,29 @@ const equityPercent = computed(() =>
 const monthlyInterest = computed(() => (props.loanAmount * (interestRate.value / 100)) / 12);
 
 const monthlyRepayment = computed(() => (props.loanAmount * (repaymentRate.value / 100)) / 12);
+
+// Calculate total loan term (time to fully pay off the loan)
+const loanTermMonths = computed(() => {
+  if (props.loanAmount <= 0 || props.monthlyMortgage <= 0) return 0;
+
+  const monthlyRate = interestRate.value / 100 / 12;
+
+  if (monthlyRate === 0) {
+    // No interest: simple division
+    return Math.ceil(props.loanAmount / props.monthlyMortgage);
+  }
+
+  // Formula: n = -log(1 - (P * r / PMT)) / log(1 + r)
+  const ratio = (props.loanAmount * monthlyRate) / props.monthlyMortgage;
+
+  // If payment doesn't cover interest, loan will never be paid off
+  if (ratio >= 1) return Infinity;
+
+  return Math.ceil(-Math.log(1 - ratio) / Math.log(1 + monthlyRate));
+});
+
+const loanTermYears = computed(() => Math.floor(loanTermMonths.value / 12));
+const loanTermRemainingMonths = computed(() => loanTermMonths.value % 12);
 </script>
 
 <template>
@@ -65,6 +88,9 @@ const monthlyRepayment = computed(() => (props.loanAmount * (repaymentRate.value
           <span class="font-medium text-amber-600"
             >{{ formatCurrency(monthlyMortgage) }}/mo</span
           ></span
+        >
+        <span class="text-gray-600"
+          >Term: <span class="font-medium text-gray-900">{{ loanTermYears }} yrs</span></span
         >
       </div>
     </div>
@@ -178,6 +204,18 @@ const monthlyRepayment = computed(() => (props.loanAmount * (repaymentRate.value
             <span class="font-medium">{{ formatCurrency(monthlyRepayment) }}</span></span
           >
         </div>
+      </div>
+
+      <!-- Loan Term -->
+      <div class="rounded-md bg-gray-50 p-3">
+        <p class="text-sm text-gray-600">Total Loan Term (Gesamtlaufzeit)</p>
+        <p v-if="loanTermMonths === Infinity" class="text-lg font-semibold text-red-600">
+          Never (payment doesn't cover interest)
+        </p>
+        <p v-else class="text-lg font-semibold text-gray-800">
+          {{ loanTermYears }} years {{ loanTermRemainingMonths }} months
+          <span class="text-sm font-normal text-gray-500">({{ loanTermMonths }} months total)</span>
+        </p>
       </div>
     </div>
   </div>
