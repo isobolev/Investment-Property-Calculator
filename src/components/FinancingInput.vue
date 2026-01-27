@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import PaymentScheduleModal from './PaymentScheduleModal.vue';
 
 const equity = defineModel<number>('equity', { required: true });
 const interestRate = defineModel<number>('interestRate', { required: true });
@@ -13,6 +14,7 @@ const props = defineProps<{
 }>();
 
 const isExpanded = ref(false);
+const showPaymentSchedule = ref(false);
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('de-DE', {
@@ -208,7 +210,16 @@ const loanTermRemainingMonths = computed(() => loanTermMonths.value % 12);
 
       <!-- Loan Term -->
       <div class="rounded-md bg-gray-50 p-3">
-        <p class="text-sm text-gray-600">Total Loan Term (Gesamtlaufzeit)</p>
+        <div class="flex items-center justify-between">
+          <p class="text-sm text-gray-600">Total Loan Term (Gesamtlaufzeit)</p>
+          <button
+            v-if="loanTermMonths !== Infinity && loanTermMonths > 0"
+            @click="showPaymentSchedule = true"
+            class="rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200"
+          >
+            View Schedule
+          </button>
+        </div>
         <p v-if="loanTermMonths === Infinity" class="text-lg font-semibold text-red-600">
           Never (payment doesn't cover interest)
         </p>
@@ -218,5 +229,16 @@ const loanTermRemainingMonths = computed(() => loanTermMonths.value % 12);
         </p>
       </div>
     </div>
+
+    <!-- Payment Schedule Modal -->
+    <Teleport to="body">
+      <PaymentScheduleModal
+        v-if="showPaymentSchedule"
+        :loanAmount="loanAmount"
+        :monthlyMortgage="monthlyMortgage"
+        :interestRate="interestRate"
+        @close="showPaymentSchedule = false"
+      />
+    </Teleport>
   </div>
 </template>

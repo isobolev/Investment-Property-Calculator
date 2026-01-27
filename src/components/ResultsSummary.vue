@@ -718,12 +718,18 @@ const realEstateAdvantage = computed(() => {
           </div>
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">Sale proceeds</span>
-            <span class="font-medium text-emerald-600">{{ formatCurrency(saleProceeds) }}</span>
+            <span
+              class="font-medium"
+              :class="saleProceeds >= 0 ? 'text-emerald-600' : 'text-red-600'"
+              >{{ formatCurrency(saleProceeds) }}</span
+            >
           </div>
           <hr class="my-2 border-emerald-200" />
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">Appreciation ({{ appreciationRate }}% p.a.)</span>
-            <span class="text-emerald-600">+{{ formatCurrency(appreciation) }}</span>
+            <span :class="appreciation >= 0 ? 'text-emerald-600' : 'text-red-600'"
+              >{{ appreciation >= 0 ? '+' : '' }}{{ formatCurrency(appreciation) }}</span
+            >
           </div>
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">Principal Paid ({{ holdingPeriod }} yrs)</span>
@@ -795,7 +801,9 @@ const realEstateAdvantage = computed(() => {
             <span>Net profit after tax</span>
             <span class="text-blue-700">{{ formatCurrency(alternativeNetProfitAfterTax) }}</span>
           </div>
-          <p class="text-xs text-gray-500">Portfolio value − Total contributions − Capital gains tax</p>
+          <p class="text-xs text-gray-500">
+            Portfolio value − Total contributions − Capital gains tax
+          </p>
           <div class="flex justify-between text-lg font-bold">
             <span>ROI p.a. after tax (CAGR)</span>
             <span class="text-blue-700">{{ formatPercent(alternativeRoiAfterTax) }}</span>
@@ -804,7 +812,14 @@ const realEstateAdvantage = computed(() => {
         </div>
 
         <!-- Comparison -->
-        <div class="mt-4 rounded-md border-2 p-4" :class="realEstateAdvantage >= 0 ? 'border-emerald-300 bg-emerald-50' : 'border-red-300 bg-red-50'">
+        <div
+          class="mt-4 rounded-md border-2 p-4"
+          :class="
+            realEstateAdvantage >= 0
+              ? 'border-emerald-300 bg-emerald-50'
+              : 'border-red-300 bg-red-50'
+          "
+        >
           <div class="flex justify-between text-lg font-bold">
             <span>Real Estate vs. Stocks/ETF</span>
             <span :class="realEstateAdvantage >= 0 ? 'text-emerald-700' : 'text-red-600'">

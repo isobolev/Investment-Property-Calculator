@@ -70,7 +70,9 @@ const isExpanded = ref(false);
             <span class="text-gray-600">%</span>
           </div>
         </div>
-        <p class="mt-1 text-xs text-gray-500">Annual property value change (negative = depreciation)</p>
+        <p class="mt-1 text-xs text-gray-500">
+          Annual property value change (negative = depreciation)
+        </p>
       </div>
 
       <!-- Holding Period -->
