@@ -60,9 +60,7 @@ export function useCalculations(
   );
 
   const purchaseCostsRate = computed(() =>
-    property.purchasePrice.value > 0
-      ? (totalPurchaseCosts.value / property.purchasePrice.value) * 100
-      : 0
+    purchaseBase.value > 0 ? (totalPurchaseCosts.value / purchaseBase.value) * 100 : 0
   );
 
   // Total investment
