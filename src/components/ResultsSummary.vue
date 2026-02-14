@@ -4,6 +4,7 @@ import { ref, computed } from 'vue';
 const props = defineProps<{
   // Purchase costs
   purchasePrice: number;
+  garagePurchasePrice: number;
   transferTax: number;
   notaryFees: number;
   landRegistryFees: number;
@@ -236,6 +237,12 @@ const realEstateAdvantage = computed(() => {
             >Price:
             <span class="font-medium text-gray-900">{{ formatCurrency(purchasePrice) }}</span></span
           >
+          <span v-if="garagePurchasePrice > 0" class="text-gray-600"
+            >Garage:
+            <span class="font-medium text-gray-900">{{
+              formatCurrency(garagePurchasePrice)
+            }}</span></span
+          >
           <span class="text-gray-600">
             Costs:
             <span class="font-medium text-gray-900">
@@ -257,6 +264,10 @@ const realEstateAdvantage = computed(() => {
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">Purchase Price (Kaufpreis)</span>
             <span class="font-medium">{{ formatCurrency(purchasePrice) }}</span>
+          </div>
+          <div v-if="garagePurchasePrice > 0" class="flex justify-between text-sm">
+            <span class="text-gray-600">Garage/Parking (Garage/Stellplatz)</span>
+            <span class="font-medium">{{ formatCurrency(garagePurchasePrice) }}</span>
           </div>
           <hr class="border-gray-200" />
           <div class="flex justify-between text-sm">

@@ -2,6 +2,7 @@ import { computed, type Ref } from 'vue';
 
 export interface PropertyInputs {
   purchasePrice: Ref<number>;
+  garagePurchasePrice: Ref<number>;
   stateCode: Ref<string>;
   stateTaxRate: Ref<number>;
   notaryRate: Ref<number>;
@@ -36,23 +37,22 @@ export function useCalculations(
   rental: RentalInputs,
   tax?: TaxInputs
 ) {
-  // Purchase costs (Kaufnebenkosten)
-  const transferTax = computed(
-    () => property.purchasePrice.value * (property.stateTaxRate.value / 100)
+  // Combined purchase base (property + garage)
+  const purchaseBase = computed(
+    () => property.purchasePrice.value + property.garagePurchasePrice.value
   );
 
-  const notaryFees = computed(
-    () => property.purchasePrice.value * (property.notaryRate.value / 100)
-  );
+  // Purchase costs (Kaufnebenkosten)
+  const transferTax = computed(() => purchaseBase.value * (property.stateTaxRate.value / 100));
+
+  const notaryFees = computed(() => purchaseBase.value * (property.notaryRate.value / 100));
 
   const landRegistryFees = computed(
-    () => property.purchasePrice.value * (property.landRegistryRate.value / 100)
+    () => purchaseBase.value * (property.landRegistryRate.value / 100)
   );
 
   const brokerFees = computed(() =>
-    property.includeBroker.value
-      ? property.purchasePrice.value * (property.brokerRate.value / 100)
-      : 0
+    property.includeBroker.value ? purchaseBase.value * (property.brokerRate.value / 100) : 0
   );
 
   const totalPurchaseCosts = computed(
@@ -66,7 +66,7 @@ export function useCalculations(
   );
 
   // Total investment
-  const totalInvestment = computed(() => property.purchasePrice.value + totalPurchaseCosts.value);
+  const totalInvestment = computed(() => purchaseBase.value + totalPurchaseCosts.value);
 
   // Financing
   const loanAmount = computed(() => Math.max(0, totalInvestment.value - financing.equity.value));
@@ -139,11 +139,9 @@ export function useCalculations(
   });
 
   // Total acquisition costs (Anschaffungskosten) for depreciation base
-  // Includes purchase price + Anschaffungsnebenkosten (transfer tax, notary fees, land registry, broker)
+  // Includes purchase price + garage + Anschaffungsnebenkosten (transfer tax, notary fees, land registry, broker)
   // All these costs are depreciated proportionally (building portion only)
-  const totalAcquisitionCost = computed(
-    () => property.purchasePrice.value + totalPurchaseCosts.value
-  );
+  const totalAcquisitionCost = computed(() => purchaseBase.value + totalPurchaseCosts.value);
 
   const buildingValue = computed(() => {
     if (!tax) return totalAcquisitionCost.value * 0.8;

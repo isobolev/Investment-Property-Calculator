@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { germanStates, getStateByCode } from '../data/germanStates';
 
 const purchasePrice = defineModel<number>('purchasePrice', { required: true });
+const garagePurchasePrice = defineModel<number>('garagePurchasePrice', { required: true });
 const stateCode = defineModel<string>('stateCode', { required: true });
 const stateTaxRate = defineModel<number>('stateTaxRate', { required: true });
 const notaryRate = defineModel<number>('notaryRate', { required: true });
@@ -34,7 +35,9 @@ const totalCostsRate = computed(() => {
   return rate;
 });
 
-const totalCosts = computed(() => (purchasePrice.value * totalCostsRate.value) / 100);
+const totalCosts = computed(
+  () => ((purchasePrice.value + garagePurchasePrice.value) * totalCostsRate.value) / 100
+);
 </script>
 
 <template>
@@ -62,6 +65,12 @@ const totalCosts = computed(() => (purchasePrice.value * totalCostsRate.value) /
           >Price:
           <span class="font-medium text-gray-900">{{ formatCurrency(purchasePrice) }}</span></span
         >
+        <span v-if="garagePurchasePrice > 0" class="text-gray-600"
+          >Garage:
+          <span class="font-medium text-gray-900">{{
+            formatCurrency(garagePurchasePrice)
+          }}</span></span
+        >
         <span class="text-gray-600"
           >Closing Costs:
           <span class="font-medium text-gray-900">{{ totalCostsRate.toFixed(1) }}%</span></span
@@ -88,6 +97,24 @@ const totalCosts = computed(() => (purchasePrice.value * totalCostsRate.value) /
           <span class="absolute right-3 top-2 text-gray-500"></span>
         </div>
         <p class="mt-1 text-sm text-gray-500">{{ formatCurrency(purchasePrice) }}</p>
+      </div>
+
+      <!-- Garage/Parking Purchase Price -->
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">
+          Garage/Parking Price (Garage/Stellplatz-Kaufpreis)
+        </label>
+        <div class="relative">
+          <input
+            v-model.number="garagePurchasePrice"
+            type="number"
+            min="0"
+            step="5000"
+            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+            placeholder="0"
+          />
+        </div>
+        <p class="mt-1 text-sm text-gray-500">{{ formatCurrency(garagePurchasePrice) }}</p>
       </div>
 
       <!-- State Selector -->

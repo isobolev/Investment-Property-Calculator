@@ -10,6 +10,7 @@ import { useCalculations } from './composables/useCalculations';
 
 // Property inputs
 const purchasePrice = ref(300000);
+const garagePurchasePrice = ref(0);
 const stateCode = ref('BY');
 const stateTaxRate = ref(3.5);
 const notaryRate = ref(1.5);
@@ -44,6 +45,7 @@ const stockReturnRate = ref(7);
 const calculations = useCalculations(
   {
     purchasePrice,
+    garagePurchasePrice,
     stateCode,
     stateTaxRate,
     notaryRate,
@@ -93,6 +95,7 @@ const calculations = useCalculations(
           </h2>
           <PropertyInput
             v-model:purchasePrice="purchasePrice"
+            v-model:garagePurchasePrice="garagePurchasePrice"
             v-model:stateCode="stateCode"
             v-model:stateTaxRate="stateTaxRate"
             v-model:notaryRate="notaryRate"
@@ -145,6 +148,7 @@ const calculations = useCalculations(
           </h2>
           <ResultsSummary
             :purchasePrice="purchasePrice"
+            :garagePurchasePrice="garagePurchasePrice"
             :transferTax="calculations.transferTax.value"
             :notaryFees="calculations.notaryFees.value"
             :landRegistryFees="calculations.landRegistryFees.value"
